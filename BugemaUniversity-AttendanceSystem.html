@@ -1753,11 +1753,11 @@ tbody td {
         <div id="lecturer-reg-extra">
           <div class="form-group">
             <label class="form-label">Employee ID</label>
-            <input type="text" class="form-input" placeholder="EMP-001234">
+            <input type="text" class="form-input" id="register-employee-id" placeholder="EMP-001234">
           </div>
           <div class="form-group">
             <label class="form-label">Department / School</label>
-            <select class="form-select">
+            <select class="form-select" id="register-department">
               <option>School of Business & Management</option>
               <option>School of Education</option>
               <option>School of Science & Technology</option>
@@ -1775,12 +1775,12 @@ tbody td {
         <div id="student-reg-extra" style="display:none;">
           <div class="form-group">
             <label class="form-label">Student ID <span style="color:var(--text-muted);font-weight:400;font-size:10px;">Format: 24/BSE/BU/R/0004</span></label>
-            <input type="text" class="form-input" id="reg-student-id" placeholder="e.g. 24/BSE/BU/R/0004" oninput="validateStudentId(this)" style="text-transform:uppercase;">
+            <input type="text" class="form-input" id="register-student-id" placeholder="e.g. 24/BSE/BU/R/0004" oninput="validateStudentId(this)" style="text-transform:uppercase;">
             <div id="student-id-hint" style="font-size:11px;color:var(--text-muted);margin-top:4px;">Year / Programme / Campus / Category / Number</div>
           </div>
           <div class="form-group">
             <label class="form-label">Year of Study</label>
-            <select class="form-select">
+            <select class="form-select" id="register-year-of-study">
               <option>Year 1</option>
               <option>Year 2</option>
               <option>Year 3</option>
@@ -3079,16 +3079,15 @@ let currentRole = 'lecturer';
 function switchRole(role) {
   currentRole = role;
   document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelector(`[onclick="switchRole('${role}')"]`).classList.add('active');
   document.getElementById('lecturer-login-extra').style.display = role === 'lecturer' ? 'block' : 'none';
-  document.getElementById('student-login-extra').style.display = role === 'student' ? 'block' : 'none';
   document.getElementById('lecturer-reg-extra').style.display = role === 'lecturer' ? 'block' : 'none';
   document.getElementById('student-reg-extra').style.display = role === 'student' ? 'block' : 'none';
 }
 
 function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab-btn').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
   document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
 }
@@ -3146,11 +3145,13 @@ async function doRegister() {
   // Add role-specific fields
   if (currentRole === 'student') {
     const studentId = document.getElementById('register-student-id').value;
+    const yearOfStudy = document.getElementById('register-year-of-study').value;
     if (!studentId) {
       showToast('Student ID is required', 'error');
       return;
     }
     payload.student_id = studentId;
+    payload.year_of_study = yearOfStudy;
   } else {
     const employeeId = document.getElementById('register-employee-id').value;
     const department = document.getElementById('register-department').value;
