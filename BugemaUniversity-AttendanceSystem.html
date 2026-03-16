@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0052cc">
 <meta name="description" content="Bugema University — Smart Biometric Attendance System">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BU Attend">
@@ -13,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 <link rel="manifest" id="manifest-placeholder">
 
 <style>
@@ -1143,14 +1145,35 @@ tbody td {
   justify-content: center;
 }
 
+.table-container, .table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-sm);
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 /* ===================== PAGES ===================== */
 .page { display: none; }
 .page.active { display: block; }
 
 /* ===================== RESPONSIVE ===================== */
+
+/* Large tablets and small laptops */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .courses-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Tablets */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 280px;
   }
 
   .sidebar.open {
@@ -1170,6 +1193,12 @@ tbody td {
   .page-content { padding: 16px; }
 
   .topbar { padding: 0 16px; }
+  
+  .topbar-title { font-size: 14px; }
+  
+  .topbar-actions { gap: 8px; }
+  
+  .topbar-btn { width: 36px; height: 36px; }
 
   .sidebar-overlay {
     position: fixed;
@@ -1180,10 +1209,174 @@ tbody td {
   }
 
   .sidebar-overlay.open { display: block; }
+  
+  /* Tables */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .data-table {
+    min-width: 600px;
+    font-size: 13px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+  }
+  
+  /* Cards */
+  .courses-grid { grid-template-columns: 1fr; }
+  
+  .card { padding: 16px; }
+  
+  /* Forms */
+  .form-group { margin-bottom: 16px; }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 12px 14px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Modals */
+  .modal {
+    max-width: calc(100% - 32px);
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  /* Flex layouts */
+  .flex.justify-between {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .flex.justify-between > * {
+    width: 100%;
+  }
+  
+  /* Search bars */
+  .search-bar {
+    max-width: 100% !important;
+    width: 100%;
+  }
+  
+  /* Charts */
+  .chart-container {
+    height: 250px;
+    min-height: 250px;
+  }
+  
+  /* Attendance session */
+  .attendance-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Student cards */
+  .student-card {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
+/* Mobile phones */
 @media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid { 
+    grid-template-columns: 1fr; 
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+  }
+  
+  /* Auth page */
+  .auth-card {
+    padding: 24px 20px;
+    margin: 16px;
+  }
+  
+  .auth-logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  /* Tables */
+  .data-table {
+    min-width: 500px;
+    font-size: 12px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+  }
+  
+  /* Buttons */
+  .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .btn-lg {
+    padding: 14px 24px;
+  }
+  
+  /* Page headers */
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .page-header h1 {
+    font-size: 20px;
+  }
+  
+  /* Terminal/logs */
+  .terminal {
+    font-size: 11px;
+  }
+  
+  /* Device status cards */
+  .device-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Notifications */
+  .notification-item {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* Theme picker */
+  #theme-picker {
+    right: -60px;
+    min-width: 140px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 20px 16px;
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 10px 12px;
+  }
+  
+  .topbar-title {
+    font-size: 12px;
+  }
 }
 
 /* ===================== ANIMATIONS ===================== */
@@ -3885,10 +4078,10 @@ const manifest = {
   name: "Bugema University Attendance System",
   short_name: "BU Attend",
   description: "Bugema University Smart Biometric Attendance System",
-  start_url: "/",
+  start_url: ".",
   display: "standalone",
-  background_color: "#070d0a",
-  theme_color: "#00e87a",
+  background_color: "#ffffff",
+  theme_color: "#0052cc",
   orientation: "any",
   icons: [
     { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23070d0a'/%3E%3Ctext y='140' font-size='120' text-anchor='middle' x='96'%3E🔬%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
