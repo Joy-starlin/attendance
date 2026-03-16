@@ -1,0 +1,37 @@
+{
+  "name": "bugema-attendance-api",
+  "version": "2.0.0",
+  "description": "Bugema University Biometric Attendance System API",
+  "main": "BugemaAttend_Backend_server.js",
+  "scripts": {
+    "start": "node BugemaAttend_Backend_server.js",
+    "dev": "nodemon BugemaAttend_Backend_server.js",
+    "migrate": "node BugemaAttend_Backend_server.js migrate"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "jspdf": "^2.5.1",
+    "nodemailer": "^6.9.7",
+    "pg": "^8.11.0",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "biometric",
+    "attendance",
+    "esp32",
+    "university",
+    "fingerprint"
+  ],
+  "author": "Bugema University",
+  "license": "MIT"
+}
