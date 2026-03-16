@@ -19,53 +19,53 @@
 
 <style>
 :root {
-  --bg-deep: #f0f5ff;
+  --bg-deep: #f8fafc;
   --bg-primary: #ffffff;
-  --bg-secondary: #e6f0ff;
+  --bg-secondary: #f1f5f9;
   --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-card-hover: rgba(240, 248, 255, 0.98);
-  --green-primary: #0052cc;
-  --green-secondary: #003d99;
-  --green-dim: #002966;
-  --green-glow: rgba(0, 82, 204, 0.15);
-  --green-glow-strong: rgba(0, 82, 204, 0.3);
-  --teal: #0066ff;
-  --text-primary: #001a4d;
-  --text-secondary: #0047b3;
-  --text-muted: #6680b3;
-  --status-green: #00cc66;
-  --status-red: #ff4466;
-  --status-yellow: #ffcc00;
-  --border: rgba(0, 82, 204, 0.2);
-  --border-strong: rgba(0, 82, 204, 0.4);
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-  --shadow-green: 0 0 20px rgba(0, 82, 204, 0.15);
+  --bg-card-hover: rgba(248, 250, 252, 0.98);
+  --green-primary: #2563eb;
+  --green-secondary: #1d4ed8;
+  --green-dim: #1e40af;
+  --green-glow: rgba(37, 99, 235, 0.15);
+  --green-glow-strong: rgba(37, 99, 235, 0.3);
+  --teal: #0891b2;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --status-green: #10b981;
+  --status-red: #ef4444;
+  --status-yellow: #f59e0b;
+  --border: rgba(37, 99, 235, 0.2);
+  --border-strong: rgba(37, 99, 235, 0.4);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-green: 0 0 20px rgba(37, 99, 235, 0.15);
   --sidebar-w: 260px;
   --radius: 12px;
   --radius-sm: 8px;
 }
 
-/* ===== THEME: BUGEMA DARK (Blue Dark) ===== */
+/* ===== THEME: BUGEMA DARK (Professional Blue Dark) ===== */
 [data-theme="blue"] {
-  --bg-deep: #03070f;
-  --bg-primary: #060d1a;
-  --bg-secondary: #0c1628;
-  --bg-card: rgba(8,16,32,0.9);
-  --bg-card-hover: rgba(12,22,42,0.98);
-  --green-primary: #4da8ff;
-  --green-secondary: #2280e0;
-  --green-dim: #1050a0;
-  --green-glow: rgba(77,168,255,0.2);
-  --green-glow-strong: rgba(77,168,255,0.45);
-  --teal: #00d4ff;
-  --text-primary: #d8eaff;
-  --text-secondary: #6aa0cc;
-  --text-muted: #2c4d70;
-  --status-green: #00e87a;
-  --border: rgba(77,168,255,0.15);
-  --border-strong: rgba(77,168,255,0.35);
-  --shadow: 0 4px 24px rgba(0,0,0,0.7);
-  --shadow-green: 0 0 20px rgba(77,168,255,0.2);
+  --bg-deep: #0f172a;
+  --bg-primary: #1e293b;
+  --bg-secondary: #334155;
+  --bg-card: rgba(30, 41, 59, 0.95);
+  --bg-card-hover: rgba(51, 65, 85, 0.98);
+  --green-primary: #3b82f6;
+  --green-secondary: #2563eb;
+  --green-dim: #1d4ed8;
+  --green-glow: rgba(59, 130, 246, 0.2);
+  --green-glow-strong: rgba(59, 130, 246, 0.45);
+  --teal: #06b6d4;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --status-green: #10b981;
+  --border: rgba(59, 130, 246, 0.2);
+  --border-strong: rgba(59, 130, 246, 0.4);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-green: 0 0 20px rgba(59, 130, 246, 0.2);
 }
 
 /* ===== THEME: BUGEMA LIGHT ===== */
@@ -130,10 +130,10 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(0, 82, 204, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(77, 168, 255, 0.03) 0%, transparent 50%),
-    linear-gradient(rgba(0, 82, 204, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 82, 204, 0.02) 1px, transparent 1px);
+    radial-gradient(circle at 20% 20%, var(--green-glow) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--green-glow-strong) 0%, transparent 50%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
   pointer-events: none;
   z-index: 0;
@@ -358,8 +358,9 @@ body::before {
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
-  background: linear-gradient(180deg, rgba(7,13,10,0.98) 0%, rgba(10,20,14,0.98) 100%);
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   border-right: 1px solid var(--border);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -435,8 +436,8 @@ body::before {
   letter-spacing: 2px;
   color: var(--text-muted);
   text-transform: uppercase;
-  padding: 8px 8px 4px;
-  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-top: 16px;
 }
 
 .nav-item {
@@ -456,13 +457,13 @@ body::before {
 }
 
 .nav-item:hover {
-  background: rgba(0, 232, 122, 0.07);
+  background: var(--green-glow);
   color: var(--text-primary);
   border-color: var(--border);
 }
 
 .nav-item.active {
-  background: rgba(0, 232, 122, 0.12);
+  background: var(--green-glow-strong);
   color: var(--green-primary);
   border-color: var(--border-strong);
 }
@@ -1752,10 +1753,6 @@ tbody td {
         </div>
         <div id="lecturer-reg-extra">
           <div class="form-group">
-            <label class="form-label">Employee ID</label>
-            <input type="text" class="form-input" id="register-employee-id" placeholder="EMP-001234">
-          </div>
-          <div class="form-group">
             <label class="form-label">Department / School</label>
             <select class="form-select" id="register-department">
               <option>School of Business & Management</option>
@@ -1807,12 +1804,13 @@ tbody td {
       </div>
 
       <!-- PROMINENT PWA INSTALL BUTTON -->
-      <div id="pwa-install-section" style="margin-top:20px;text-align:center;padding:20px;border-top:1px solid var(--border);">
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">📱 Get the best experience with our app</p>
-        <button class="btn btn-primary" onclick="installPWA()" style="width:100%;font-size:14px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--green-primary),var(--teal));border:none;box-shadow:0 4px 15px var(--green-glow);">
-          <span>📥</span> Install Bugema Attendance App
+      <div id="pwa-install-section" style="margin-top:20px;text-align:center;padding:24px;border-top:1px solid var(--border);background:linear-gradient(135deg,var(--bg-secondary),var(--bg-primary));border-radius:var(--radius-sm);">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;font-weight:500;">📱 Install Bugema Attendance App</p>
+        <button class="btn btn-primary" onclick="installPWA()" style="width:100%;font-size:15px;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--green-primary),var(--green-secondary));border:none;box-shadow:0 6px 20px var(--green-glow-strong);border-radius:var(--radius-sm);font-weight:600;letter-spacing:0.5px;transition:all 0.3s ease;">
+          <span style="font-size:18px;">📥</span> 
+          <span>INSTALL APP NOW</span>
         </button>
-        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Works offline • Fast access • Native experience</p>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.4;">✨ Works offline • Fast access • Native experience • No app store needed</p>
       </div>
 
     </div>
@@ -3145,17 +3143,17 @@ async function doRegister() {
   // Add role-specific fields
   if (currentRole === 'student') {
     const studentId = document.getElementById('register-student-id').value;
-    const yearOfStudy = document.getElementById('register-year-of-study').value;
+    const yearOfStudySelect = document.getElementById('register-year-of-study');
+    const yearOfStudy = yearOfStudySelect.options[yearOfStudySelect.selectedIndex].text;
+    
     if (!studentId) {
       showToast('Student ID is required', 'error');
       return;
     }
     payload.student_id = studentId;
-    payload.year_of_study = yearOfStudy;
+    payload.year_of_study = parseInt(yearOfStudy.replace('Year ', ''));
   } else {
-    const employeeId = document.getElementById('register-employee-id').value;
     const department = document.getElementById('register-department').value;
-    payload.employee_id = employeeId;
     payload.department = department;
   }
 
@@ -4314,7 +4312,7 @@ const manifest = {
   name: "Bugema University Attendance System",
   short_name: "BU Attend",
   description: "Bugema University Smart Biometric Attendance System",
-  start_url: ".",
+  start_url: "./",
   display: "standalone",
   background_color: "#ffffff",
   theme_color: "#0052cc",

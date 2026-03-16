@@ -205,57 +205,9 @@ async function initDatabase() {
   }
 }
 
-// Insert sample data
+// Skip sample data insertion
 async function insertSampleData() {
-  try {
-    // Check if data exists
-    const [rows] = await pool.execute('SELECT COUNT(*) as count FROM users');
-    if (rows[0].count > 0) return;
-
-    const lecturerId = uuidv4();
-    const studentId = uuidv4();
-    const lecturerHash = bcrypt.hashSync('password123', 10);
-    const studentHash = bcrypt.hashSync('password123', 10);
-
-    // Insert lecturer
-    await pool.execute(
-      `INSERT INTO users (id, name, email, password_hash, role, employee_id, department) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [lecturerId, 'Dr. John Doe', 'john@bugema.ac.ug', lecturerHash, 'lecturer', 'EMP001', 'Computer Science']
-    );
-
-    // Insert student
-    await pool.execute(
-      `INSERT INTO users (id, name, email, password_hash, role, student_id, year_of_study) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [studentId, 'Alice Johnson', 'alice@bugema.ac.ug', studentHash, 'student', '24/BSE/BU/R/0001', 2]
-    );
-
-    // Insert course
-    const courseId = uuidv4();
-    await pool.execute(
-      `INSERT INTO courses (id, code, name, lecturer_id, description) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [courseId, 'CS101', 'Introduction to Programming', lecturerId, 'Basic programming concepts']
-    );
-
-    // Enroll student in course
-    await pool.execute(
-      `INSERT INTO student_courses (student_id, course_id) VALUES (?, ?)`,
-      [studentId, courseId]
-    );
-
-    // Insert device
-    await pool.execute(
-      `INSERT INTO devices (id, name, location, type, status, battery_level) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      ['ESP32-LAB-A', 'Lab Device A', 'Computer Lab 1', 'lab', 'online', 85]
-    );
-
-    console.log('✅ Sample data inserted');
-  } catch (err) {
-    console.error('❌ Failed to insert sample data:', err.message);
-  }
+  console.log('✅ Skipping sample data - starting with clean database');
 }
 
 // Routes
