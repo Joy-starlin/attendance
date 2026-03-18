@@ -55,6 +55,11 @@ const app  = express();
 const server = http.createServer(app);
 
 // ============================================================
+//  TRUST PROXY (for Railway.app and other hosting platforms)
+// ============================================================
+app.set('trust proxy', true);
+
+// ============================================================
 //  DATABASE (PostgreSQL)
 // ============================================================
 const db = new Pool({
@@ -71,8 +76,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Rate limiting
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+// Rate limiting (configured for Railway.app)
+const limiter = rateLimit({ 
+  windowMs: 15 * 60 * 1000, 
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip rate limiting for Railway health checks
+  skip: (req) => req.url === '/health' || req.url === '/api/health'
+});
 app.use(limiter);
 
 // ============================================================
@@ -671,6 +683,34 @@ async function migrate() {
 if (process.argv[2] === 'migrate') {
   migrate().catch(console.error);
 }
+
+// ============================================================
+//  HEALTH CHECK ENDPOINT (for Railway.app)
+// ============================================================
+app.get('/health', async (req, res) => {
+  try {
+    // Test database connection
+    await db.query('SELECT 1');
+    
+    res.status(200).json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+      websocket: 'active'
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
+});
+
+app.get('/api/health', async (req, res) => {
+  res.redirect('/health');
+});
 
 // ============================================================
 //  START SERVER
