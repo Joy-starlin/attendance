@@ -42,7 +42,7 @@
 'use strict';
 require('dotenv').config();
 const express    = require('express');
-const { Pool }   = require('pg');
+const sqlite3    = require('sqlite3').verbose();
 const bcrypt     = require('bcryptjs');
 const jwt        = require('jsonwebtoken');
 const cors       = require('cors');
@@ -55,12 +55,35 @@ const app  = express();
 const server = http.createServer(app);
 
 // ============================================================
-//  DATABASE (PostgreSQL)
+//  DATABASE (SQLite)
 // ============================================================
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+const db = new sqlite3.Database('./bugema_attendance.db', (err) => {
+  if (err) {
+    console.error('Database connection error:', err.message);
+  } else {
+    console.log('Connected to SQLite database.');
+    initializeDatabase();
+  }
 });
+
+// Helper function to run queries
+const dbQuery = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
+
+const dbRun = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) {
+      if (err) reject(err);
+      else resolve({ id: this.lastID, changes: this.changes });
+    });
+  });
+};
 
 // ============================================================
 //  MIDDLEWARE
@@ -114,11 +137,11 @@ function broadcastToSession(sessionId, data) {
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
 
 function signToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret_key', { expiresIn: '7d' });
 }
 
 function verifyToken(token) {
-  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
+  try { return jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key'); } catch { return null; }
 }
 
 function authMiddleware(req, res, next) {
@@ -166,9 +189,9 @@ app.post('/api/auth/register', async (req, res) => {
   const id   = uuidv4();
 
   try {
-    await db.query(
+    await dbRun(
       `INSERT INTO users (id, name, email, password_hash, role, student_id, employee_id, department)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [id, name, email, hash, role, student_id || null, employee_id || null, department || null]
     );
 
@@ -176,10 +199,10 @@ app.post('/api/auth/register', async (req, res) => {
     if (role === 'student' && courses && courses.length > 0) {
       for (const courseEntry of courses) {
         const { course_id, day, time } = courseEntry;
-        await db.query(
+        await dbRun(
           `INSERT INTO enrollments (student_id, course_id, day, time, enrolled_at)
-           VALUES ($1, $2, $3, $4, NOW())
-           ON CONFLICT (student_id, course_id) DO NOTHING`,
+           VALUES (?, ?, ?, ?, datetime('now'))
+           ON CONFLICT(student_id, course_id) DO NOTHING`,
           [id, course_id, day, time]
         );
       }
@@ -189,7 +212,7 @@ app.post('/api/auth/register', async (req, res) => {
     res.json({ token, user: { id, name, email, role } });
 
   } catch (err) {
-    if (err.code === '23505') return res.status(400).json({ error: 'Email or Student ID already exists' });
+    if (err.message.includes('UNIQUE constraint failed')) return res.status(400).json({ error: 'Email or Student ID already exists' });
     console.error(err);
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -198,18 +221,25 @@ app.post('/api/auth/register', async (req, res) => {
 // POST /api/auth/login
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
-  const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-  const user   = result.rows[0];
+  
+  try {
+    const users = await dbQuery('SELECT * FROM users WHERE email = ?', [email]);
+    const user = users[0];
 
-  if (!user) return res.status(401).json({ error: 'User not found' });
-  const valid = await bcrypt.compare(password, user.password_hash);
-  if (!valid) return res.status(401).json({ error: 'Wrong password' });
+    if (!user) return res.status(401).json({ error: 'User not found' });
+    
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Wrong password' });
 
-  const token = signToken({ id: user.id, name: user.name, email: user.email, role: user.role });
-  res.json({
-    token,
-    user: { id: user.id, name: user.name, email: user.email, role: user.role }
-  });
+    const token = signToken({ id: user.id, name: user.name, email: user.email, role: user.role });
+    res.json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
 });
 
 // ============================================================
@@ -671,6 +701,87 @@ async function migrate() {
 if (process.argv[2] === 'migrate') {
   migrate().catch(console.error);
 }
+
+// Database initialization
+async function initializeDatabase() {
+  try {
+    // Create tables
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'student',
+        student_id TEXT,
+        employee_id TEXT,
+        department TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS courses (
+        id TEXT PRIMARY KEY,
+        code TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        lecturer_id TEXT NOT NULL,
+        credits INTEGER DEFAULT 3,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS enrollments (
+        student_id TEXT NOT NULL,
+        course_id TEXT NOT NULL,
+        day TEXT,
+        time TEXT,
+        enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (student_id, course_id)
+      )
+    `);
+
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        course_id TEXT NOT NULL,
+        lecturer_id TEXT NOT NULL,
+        device_id TEXT,
+        started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        ended_at DATETIME,
+        duration_minutes INTEGER,
+        status TEXT DEFAULT 'active'
+      )
+    `);
+
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS attendance (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        course_id TEXT NOT NULL,
+        student_id TEXT NOT NULL,
+        status TEXT DEFAULT 'present',
+        marked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (session_id, student_id)
+      )
+    `);
+
+    console.log('✅ Database initialized successfully');
+  } catch (error) {
+    console.error('Database initialization error:', error);
+  }
+}
+
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    const result = await dbQuery('SELECT 1 as test');
+    res.json({ status: 'healthy', database: 'connected', result: result[0] });
+  } catch (error) {
+    res.status(500).json({ status: 'unhealthy', error: error.message });
+  }
+});
 
 // ============================================================
 //  START SERVER

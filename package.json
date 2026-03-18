@@ -4,9 +4,12 @@
   "description": "Bugema University Biometric Attendance System API",
   "main": "BugemaAttend_Backend_server.js",
   "scripts": {
-    "start": "node BugemaAttend_Backend_server.js",
-    "dev": "nodemon BugemaAttend_Backend_server.js",
-    "migrate": "node BugemaAttend_Backend_server.js migrate"
+    "start": "node mysql-server.js",
+    "dev": "nodemon mysql-server.js",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:build": "cd frontend && npm run build",
+    "build": "npm run frontend:install && npm run frontend:build",
+    "postinstall": "npm run frontend:install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
