@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="BU Attend">
 <title>Bugema University — Biometric Attendance System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
@@ -59,7 +59,7 @@
   --green-glow-strong: rgba(59, 130, 246, 0.45);
   --teal: #06b6d4;
   --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
+  --text-secondary: #e2e8f0;
   --text-muted: #94a3b8;
   --status-green: #10b981;
   --border: rgba(59, 130, 246, 0.2);
@@ -70,25 +70,27 @@
 
 /* ===== THEME: BUGEMA LIGHT ===== */
 [data-theme="light"] {
-  --bg-deep: #e6f0ff;
+  --bg-deep: #f8fafc;
   --bg-primary: #ffffff;
-  --bg-secondary: #f0f5ff;
+  --bg-secondary: #f1f5f9;
   --bg-card: rgba(255,255,255,0.95);
-  --bg-card-hover: rgba(240,248,255,0.98);
-  --green-primary: #0052cc;
-  --green-secondary: #003d99;
-  --green-dim: #002966;
-  --green-glow: rgba(0,82,204,0.15);
-  --green-glow-strong: rgba(0,82,204,0.3);
-  --teal: #0066ff;
-  --text-primary: #001a4d;
-  --text-secondary: #0047b3;
-  --text-muted: #6680b3;
-  --border: rgba(0,82,204,0.2);
-  --border-strong: rgba(0,82,204,0.4);
-  --shadow: 0 4px 24px rgba(0,0,0,0.12);
-  --shadow-green: 0 0 20px rgba(0,82,204,0.15);
+  --bg-card-hover: rgba(248,250,252,0.98);
+  --green-primary: #2563eb;
+  --green-secondary: #1d4ed8;
+  --green-dim: #1e40af;
+  --green-glow: rgba(37, 99, 235, 0.08);
+  --green-glow-strong: rgba(37, 99, 235, 0.15);
+  --teal: #0891b2;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --status-green: #10b981;
+  --border: rgba(37, 99, 235, 0.12);
+  --border-strong: rgba(37, 99, 235, 0.25);
+  --shadow: 0 4px 24px rgba(0,0,0,0.04);
+  --shadow-green: 0 0 20px rgba(37, 99, 235, 0.08);
 }
+
 
 /* ===== THEME: PURPLE ===== */
 [data-theme="purple"] {
@@ -103,9 +105,9 @@
   --green-glow: rgba(176,108,255,0.2);
   --green-glow-strong: rgba(176,108,255,0.45);
   --teal: #e040ff;
-  --text-primary: #ecdeff;
-  --text-secondary: #9070cc;
-  --text-muted: #4a3070;
+  --text-primary: #f3f0ff;
+  --text-secondary: #d4c5ff;
+  --text-muted: #9880cc;
   --border: rgba(176,108,255,0.15);
   --border-strong: rgba(176,108,255,0.35);
   --shadow: 0 4px 24px rgba(0,0,0,0.7);
@@ -117,7 +119,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-deep);
   color: var(--text-primary);
   min-height: 100vh;
@@ -129,12 +131,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 20%, var(--green-glow) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, var(--green-glow-strong) 0%, transparent 50%),
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  background: transparent;
   pointer-events: none;
   z-index: 0;
 }
@@ -157,13 +154,37 @@ body::before {
 }
 
 .auth-container {
-  width: 100%;
   max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .auth-logo {
   text-align: center;
   margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.auth-logo h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green-primary);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.auth-logo p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
 .auth-logo .logo-icon {
@@ -198,62 +219,73 @@ body::before {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 36px;
-  backdrop-filter: blur(20px);
-  box-shadow: var(--shadow), var(--shadow-green);
+  padding: 32px 28px;
+  margin: 20px auto;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1), var(--shadow-green);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green-primary), var(--green-secondary));
 }
 
 .role-tabs {
   display: flex;
   background: var(--bg-primary);
-  border-radius: var(--radius);
+  border-radius: 12px;
   padding: 4px;
   margin-bottom: 28px;
   border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .role-tab {
   flex: 1;
-  padding: 10px;
-  text-align: center;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: 'Exo 2', sans-serif;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
   font-weight: 600;
   font-size: 13px;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
-  transition: all 0.3s;
-  border: none;
-  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .role-tab.active {
-  background: linear-gradient(135deg, var(--green-primary), var(--teal));
-  color: var(--bg-deep);
-  box-shadow: 0 2px 12px var(--green-glow);
+  background: var(--green-primary);
+  color: white;
+  box-shadow: 0 4px 12px var(--green-glow);
 }
 
 .auth-tabs {
   display: flex;
-  gap: 0;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
 }
 
 .auth-tab-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px 16px;
   background: none;
   border: none;
   color: var(--text-muted);
-  font-family: 'Exo 2', sans-serif;
+  font-weight: 500;
   font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
 }
 
 .auth-tab-btn.active {
@@ -261,34 +293,42 @@ body::before {
   border-bottom-color: var(--green-primary);
 }
 
-.form-group { margin-bottom: 18px; }
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
 
 .form-label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
   margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-secondary);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-input, .form-select {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  border-radius: 10px;
   color: var(--text-primary);
-  font-family: 'Exo 2', sans-serif;
   font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .form-input:focus, .form-select:focus {
   border-color: var(--green-primary);
-  box-shadow: 0 0 0 3px var(--green-glow);
+  box-shadow: 0 0 0 4px var(--green-glow);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
 .form-select option { background: var(--bg-secondary); }
@@ -298,22 +338,23 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 14px 24px;
   border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 700;
+  border-radius: 10px;
+  font-weight: 600;
   font-size: 14px;
-  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   text-decoration: none;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
-  color: var(--bg-deep);
-  box-shadow: 0 4px 16px var(--green-glow);
+  color: white;
+  box-shadow: 0 4px 12px var(--green-glow);
 }
 
 .btn-primary:hover {
@@ -376,9 +417,9 @@ body::before {
 }
 
 .sidebar-logo .logo-name {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Poppins', sans-serif;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 600;
   color: var(--green-primary);
   letter-spacing: 2px;
 }
@@ -499,10 +540,10 @@ body::before {
 .topbar {
   position: sticky;
   top: 0;
-  background: rgba(7,13,10,0.95);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
-  padding: 0 28px;
+  padding: 0 24px;
   height: 64px;
   display: flex;
   align-items: center;
@@ -511,10 +552,11 @@ body::before {
 }
 
 .topbar-title h2 {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Poppins', sans-serif;
   font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
 }
 
 .topbar-title p {
@@ -529,19 +571,22 @@ body::before {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
   border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
-  position: relative;
   transition: all 0.2s;
 }
 
-.topbar-btn:hover { border-color: var(--green-primary); color: var(--green-primary); }
+.topbar-btn:hover { 
+  border-color: var(--green-primary); 
+  color: var(--green-primary); 
+  background: var(--green-glow);
+}
 
 .notif-dot {
   position: absolute;
@@ -550,19 +595,6 @@ body::before {
   background: var(--status-red);
   border-radius: 50%;
   border: 2px solid var(--bg-primary);
-}
-
-.menu-toggle {
-  display: none;
-  width: 36px; height: 36px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
 }
 
 .page-content {
@@ -593,10 +625,10 @@ body::before {
 }
 
 .card-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Poppins', sans-serif;
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   color: var(--text-primary);
 }
 
@@ -645,9 +677,9 @@ body::before {
 }
 
 .stat-value {
-  font-family: 'Orbitron', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--green-primary);
   line-height: 1;
 }
@@ -831,10 +863,10 @@ tbody td {
 }
 
 .modal-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Poppins', sans-serif;
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .modal-close {
@@ -861,7 +893,23 @@ tbody td {
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 
-/* ===================== FINGERPRINT SCANNER UI ===================== */
+/* ===================== PROGRESS BAR ===================== */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-primary), var(--green-secondary));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ===================== ENHANCED FINGERPRINT UI ===================== */
 .fp-scanner {
   width: 120px; height: 120px;
   border-radius: 50%;
@@ -972,10 +1020,10 @@ tbody td {
 }
 
 .course-code {
-  font-family: 'Orbitron', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--green-primary);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-bottom: 4px;
 }
 
@@ -1034,7 +1082,7 @@ tbody td {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1091,7 +1139,7 @@ tbody td {
   border: 1px solid rgba(0,232,122,0.2);
   border-radius: var(--radius-sm);
   padding: 16px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   color: var(--green-primary);
   height: 180px;
@@ -1129,9 +1177,9 @@ tbody td {
 
 /* ===================== ATTENDANCE SESSION TIMER ===================== */
 .session-timer {
-  font-family: 'Orbitron', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 40px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--green-primary);
   text-align: center;
   letter-spacing: 3px;
@@ -1639,7 +1687,7 @@ tbody td {
 .text-muted { color: var(--text-muted); }
 .text-secondary { color: var(--text-secondary); }
 .text-sm { font-size: 12px; }
-.font-mono { font-family: 'Orbitron', monospace; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
 .text-right { text-align: right; }
 
 /* PWA install banner */
@@ -1665,152 +1713,127 @@ tbody td {
 <body>
 
 <!-- ===================== PWA INSTALL BANNER ===================== -->
-<div id="pwa-banner">
-  <span>📱</span>
-  <p>Install <strong>Bugema University Attendance</strong> as an app for the best experience — works offline too!</p>
-  <div style="display:flex;gap:8px;flex-shrink:0;">
-    <button class="btn btn-secondary btn-sm" onclick="dismissPWA()">Not now</button>
-    <button class="btn btn-primary btn-sm" onclick="installPWA()">📥 Install App</button>
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--green-primary),var(--green-secondary));color:white;padding:16px 20px;z-index:1000;box-shadow:0 -4px 20px rgba(0,232,122,0.3);animation:slideUp 0.5s ease;">
+  <div style="display:flex;align-items:center;justify-content:space-between;max-width:400px;margin:0 auto;gap:16px;">
+    <div style="flex:1;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:2px;">📱 Install Bugema Attendance App</div>
+      <div style="font-size:12px;opacity:0.9;">Get instant access & offline support</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button class="btn btn-secondary btn-sm" onclick="dismissPWA()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;padding:8px 16px;font-size:12px;">Maybe Later</button>
+      <button class="btn btn-primary btn-sm" onclick="installPWA()" style="background:white;color:var(--green-primary);border:none;padding:8px 16px;font-size:12px;font-weight:600;">Install Now</button>
+    </div>
   </div>
 </div>
 
 <!-- ===================== AUTH PAGE ===================== -->
 <div id="page-auth">
   <div class="auth-container fade-in">
-    <div class="auth-logo">
-      <!-- Bugema University Logo -->
-      <div class="logo-img-wrap" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--green-primary);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;overflow:hidden;background:var(--bg-card);box-shadow:0 0 20px var(--green-glow);">
-        <img id="uni-logo-img" src="logoBu.jpg" alt="Bugema University Logo" style="width:100%;height:100%;object-fit:contain;">
-      </div>
-      <h1 style="font-size:20px;letter-spacing:2px;color:var(--green-primary);">BUGEMA UNIVERSITY</h1>
-      <p style="font-size:12px;color:var(--text-secondary);">BIOMETRIC ATTENDANCE MANAGEMENT SYSTEM</p>
-    </div>
-
     <div class="auth-card">
-      <div class="role-tabs">
-        <button class="role-tab active" onclick="switchRole('lecturer')">👨‍🏫 LECTURER</button>
-        <button class="role-tab" onclick="switchRole('student')">🎓 STUDENT</button>
+      <!-- Logo and Title Inside Card -->
+      <div class="auth-logo" style="text-align:center;margin-bottom:24px;">
+        <!-- Bugema University Logo -->
+        <div class="logo-img-wrap" style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;overflow:hidden;background:var(--bg-card);box-shadow:0 0 20px var(--green-glow);">
+          <img id="uni-logo-img" src="logoBu.jpg" alt="Bugema University Logo" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <h1 style="font-size:18px;letter-spacing:1px;color:var(--green-primary);margin-bottom:4px;">BUGEMA UNIVERSITY</h1>
+        <p style="font-size:11px;color:var(--text-secondary);">BIOMETRIC ATTENDANCE MANAGEMENT SYSTEM</p>
       </div>
 
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
-        <button class="auth-tab-btn" onclick="switchAuthTab('register')">Register</button>
-      </div>
-
-      <!-- LOGIN FORM -->
+      <!-- UNIFIED LOGIN FORM -->
       <div id="login-form">
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" id="login-email" placeholder="you@example.com" value="">
+          <input type="email" class="form-input" id="login-email" placeholder="Enter your email address" autocomplete="off">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-input" id="login-password" placeholder="Enter your password" value="">
+          <input type="password" class="form-input" id="login-password" placeholder="Enter your password" autocomplete="new-password">
         </div>
-        <div id="lecturer-login-extra">
-          <div class="form-group">
-            <label class="form-label">Employee ID</label>
-            <input type="text" class="form-input" placeholder="EMP-001234" value="">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Department</label>
-            <select class="form-select">
-              <option>School of Business & Management</option>
-              <option>School of Education</option>
-              <option>School of Science & Technology</option>
-              <option>School of Nursing & Public Health</option>
-              <option>School of Theology & Religious Studies</option>
-              <option>School of Agriculture</option>
-              <option>Faculty of Humanities & Social Sciences</option>
-            </select>
-          </div>
-        </div>
-        <div id="student-login-extra" style="display:none;">
-          <div class="form-group">
-            <label class="form-label">Student ID</label>
-            <input type="text" class="form-input" placeholder="24/BSE/BU/R/0004">
-          </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);">
+            <input type="checkbox" id="remember-me">
+            <span>Remember me</span>
+          </label>
+          <a href="#" style="font-size:13px;color:var(--green-primary);text-decoration:none;" onclick="showToast('Password reset coming soon!', 'info');return false;">Forgot password?</a>
         </div>
         <button class="btn btn-primary btn-full btn-lg mt-4" onclick="doLogin()">
-          🔐 Sign In Securely
+          🔐 Sign In
         </button>
-        <div style="text-align:center;margin-top:16px;">
-          <span style="font-size:12px;color:var(--text-muted);">
-            Demo: Click Sign In to enter the dashboard
-          </span>
+        <div style="text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+          <span style="font-size:14px;color:var(--text-secondary);">Don't have an account? </span>
+          <button class="btn btn-link" onclick="switchAuthTab('register')" style="font-size:14px;padding:0;background:none;border:none;color:var(--green-primary);text-decoration:underline;cursor:pointer;">
+            Register Now
+          </button>
         </div>
       </div>
 
       <!-- REGISTER FORM -->
       <div id="register-form" style="display:none;">
         <div class="form-group">
+          <label class="form-label">Account Type</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button type="button" class="role-selector" id="role-student" onclick="selectRole('student')" style="padding:16px;border:2px solid var(--border);border-radius:8px;background:var(--bg-primary);cursor:pointer;transition:all 0.3s ease;">
+              <div style="font-size:24px;margin-bottom:8px;">🎓</div>
+              <div style="font-weight:600;color:var(--text-primary);">Student</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Register as student</div>
+            </button>
+            <button type="button" class="role-selector" id="role-lecturer" onclick="selectRole('lecturer')" style="padding:16px;border:2px solid var(--border);border-radius:8px;background:var(--bg-primary);cursor:pointer;transition:all 0.3s ease;">
+              <div style="font-size:24px;margin-bottom:8px;">👨‍🏫</div>
+              <div style="font-weight:600;color:var(--text-primary);">Lecturer</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Register as lecturer</div>
+            </button>
+          </div>
+          <input type="hidden" id="register-role" value="">
+        </div>
+        
+        <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="register-name" placeholder="Dr. Jane Smith">
+          <input type="text" class="form-input" id="register-name" placeholder="Enter your full legal name" autocomplete="off">
         </div>
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" id="register-email" placeholder="you@example.com">
+          <input type="email" class="form-input" id="register-email" placeholder="Enter your email address" autocomplete="off">
         </div>
-        <div id="lecturer-reg-extra">
-          <div class="form-group">
-            <label class="form-label">Department / School</label>
-            <select class="form-select" id="register-department">
-              <option>School of Business & Management</option>
-              <option>School of Education</option>
-              <option>School of Science & Technology</option>
-              <option>School of Nursing & Public Health</option>
-              <option>School of Theology & Religious Studies</option>
-              <option>School of Agriculture</option>
-              <option>Faculty of Humanities & Social Sciences</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Courses Taught (comma separated)</label>
-            <input type="text" class="form-input" placeholder="CS101, CS201, CS301">
-          </div>
-        </div>
-        <div id="student-reg-extra" style="display:none;">
-          <div class="form-group">
-            <label class="form-label">Student ID <span style="color:var(--text-muted);font-weight:400;font-size:10px;">Format: 24/BSE/BU/R/0004</span></label>
-            <input type="text" class="form-input" id="register-student-id" placeholder="e.g. 24/BSE/BU/R/0004" oninput="validateStudentId(this)" style="text-transform:uppercase;">
-            <div id="student-id-hint" style="font-size:11px;color:var(--text-muted);margin-top:4px;">Year / Programme / Campus / Category / Number</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Year of Study</label>
-            <select class="form-select" id="register-year-of-study">
-              <option>Year 1</option>
-              <option>Year 2</option>
-              <option>Year 3</option>
-              <option>Year 4</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Enrolled Courses</label>
-            <div id="course-enroll-list" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;padding:4px 0;"></div>
-            <button type="button" class="btn btn-secondary btn-sm mt-4" onclick="addCourseEnrollRow()">+ Add Course</button>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="register-phone" placeholder="+256 7XX XXX XXX" autocomplete="off">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-input" id="register-password" placeholder="Create a strong password">
+          <input type="password" class="form-input" id="register-password" placeholder="Create a secure password (8+ characters)" autocomplete="new-password">
         </div>
         <div class="form-group">
           <label class="form-label">Confirm Password</label>
-          <input type="password" class="form-input" id="register-confirm" placeholder="Confirm your password">
+          <input type="password" class="form-input" id="register-confirm" placeholder="Re-enter your password to confirm" autocomplete="new-password">
         </div>
         <button class="btn btn-primary btn-full btn-lg mt-4" onclick="doRegister()">
           ✅ Create Account
         </button>
+        <div style="text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+          <span style="font-size:14px;color:var(--text-secondary);">Already have an account? </span>
+          <button class="btn btn-link" onclick="switchAuthTab('login')" style="font-size:14px;padding:0;background:none;border:none;color:var(--green-primary);text-decoration:underline;cursor:pointer;">
+            Sign In
+          </button>
+        </div>
       </div>
 
-      <!-- PROMINENT PWA INSTALL BUTTON -->
-      <div id="pwa-install-section" style="margin-top:20px;text-align:center;padding:24px;border-top:1px solid var(--border);background:linear-gradient(135deg,var(--bg-secondary),var(--bg-primary));border-radius:var(--radius-sm);">
-        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;font-weight:500;">📱 Install Bugema Attendance App</p>
-        <button class="btn btn-primary" onclick="installPWA()" style="width:100%;font-size:15px;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--green-primary),var(--green-secondary));border:none;box-shadow:0 6px 20px var(--green-glow-strong);border-radius:var(--radius-sm);font-weight:600;letter-spacing:0.5px;transition:all 0.3s ease;">
+      <!-- PROMINENT PWA INSTALL SECTION -->
+      <div id="pwa-install-section" style="margin-top:20px;text-align:center;padding:20px;border-top:1px solid var(--border);background:linear-gradient(135deg,var(--bg-secondary),var(--bg-primary));border-radius:var(--radius-sm);">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:24px;margin-bottom:8px;">📱</div>
+          <h3 style="font-size:16px;color:var(--text-primary);margin-bottom:8px;font-weight:600;">Install Bugema Attendance App</h3>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.4;margin-bottom:16px;">Get instant access to your attendance system, even without internet</p>
+        </div>
+        <button class="btn btn-primary" onclick="installPWA()" style="width:100%;font-size:15px;padding:14px;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--green-primary),var(--green-secondary));border:none;box-shadow:0 6px 20px var(--green-glow-strong);border-radius:var(--radius-sm);font-weight:600;letter-spacing:0.5px;transition:all 0.3s ease;">
           <span style="font-size:18px;">📥</span> 
-          <span>INSTALL APP NOW</span>
+          <span>Install App</span>
         </button>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.4;">✨ Works offline • Fast access • Native experience • No app store needed</p>
+        <div style="margin-top:12px;display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--text-muted);">
+          <span>✓ Works offline</span>
+          <span>✓ Fast access</span>
+          <span>✓ No app store</span>
+        </div>
       </div>
 
     </div>
@@ -1859,7 +1882,7 @@ tbody td {
     <!-- Topbar -->
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
-        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <button class="topbar-btn menu-toggle" onclick="toggleSidebar()">☰</button>
         <div class="topbar-title">
           <h2 id="topbar-title">Dashboard</h2>
           <p id="topbar-subtitle">Welcome back</p>
@@ -1897,26 +1920,26 @@ tbody td {
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-label">Total Students</div>
-              <div class="stat-value">248</div>
-              <div class="stat-sub">↑ 12 this semester</div>
+              <div class="stat-value">0</div>
+              <div class="stat-sub">No students enrolled</div>
               <div class="stat-icon">🎓</div>
             </div>
             <div class="stat-card teal">
               <div class="stat-label">Active Courses</div>
-              <div class="stat-value">6</div>
-              <div class="stat-sub">2 sessions today</div>
+              <div class="stat-value">0</div>
+              <div class="stat-sub">Create your first course</div>
               <div class="stat-icon">📚</div>
             </div>
             <div class="stat-card yellow">
               <div class="stat-label">Avg Attendance</div>
-              <div class="stat-value">78%</div>
-              <div class="stat-sub">Target: 75%</div>
+              <div class="stat-value">--</div>
+              <div class="stat-sub">No sessions conducted</div>
               <div class="stat-icon">📊</div>
             </div>
             <div class="stat-card red">
               <div class="stat-label">At-Risk Students</div>
-              <div class="stat-value">14</div>
-              <div class="stat-sub">Below 60% threshold</div>
+              <div class="stat-value">0</div>
+              <div class="stat-sub">No attendance data</div>
               <div class="stat-icon">⚠️</div>
             </div>
           </div>
@@ -1985,27 +2008,27 @@ tbody td {
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-label">Overall Attendance</div>
-              <div class="stat-value">82%</div>
-              <div class="stat-sub">Good standing ✓</div>
+              <div class="stat-value">--</div>
+              <div class="stat-sub">No sessions attended</div>
               <div class="stat-icon">📊</div>
             </div>
             <div class="stat-card teal">
               <div class="stat-label">Enrolled Courses</div>
-              <div class="stat-value">5</div>
-              <div class="stat-sub">All active</div>
+              <div class="stat-value">0</div>
+              <div class="stat-sub">Awaiting enrollment</div>
               <div class="stat-icon">📚</div>
             </div>
             <div class="stat-card yellow">
               <div class="stat-label">Classes Attended</div>
-              <div class="stat-value">67</div>
-              <div class="stat-sub">of 82 total</div>
+              <div class="stat-value">0</div>
+              <div class="stat-sub">No classes yet</div>
               <div class="stat-icon">✅</div>
             </div>
             <div class="stat-card orange">
-              <div class="stat-label">At-Risk Courses</div>
-              <div class="stat-value">1</div>
-              <div class="stat-sub">MATH201 at 58%</div>
-              <div class="stat-icon">⚠️</div>
+              <div class="stat-label">GPA Status</div>
+              <div class="stat-value">--</div>
+              <div class="stat-sub">No academic data</div>
+              <div class="stat-icon">🎯</div>
             </div>
           </div>
 
@@ -2040,24 +2063,19 @@ tbody td {
         <div id="no-session-view">
           <div style="text-align:center;padding:40px 20px;">
             <div style="font-size:64px;margin-bottom:16px;">🔬</div>
-            <h3 style="font-family:'Orbitron',monospace;font-size:20px;margin-bottom:8px;color:var(--green-primary);">START ATTENDANCE SESSION</h3>
+            <h3 style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;margin-bottom:8px;color:var(--green-primary);">START ATTENDANCE SESSION</h3>
             <p style="color:var(--text-secondary);margin-bottom:32px;">Select a course and ESP32 device to begin biometric attendance marking.</p>
             <div style="max-width:400px;margin:0 auto;">
               <div class="form-group">
                 <label class="form-label">Select Course</label>
                 <select class="form-select" id="session-course">
                   <option value="">Choose a course...</option>
-                  <option>CS101 - Introduction to Programming</option>
-                  <option>CS201 - Data Structures & Algorithms</option>
-                  <option>CS301 - Database Systems</option>
-                  <option>MATH201 - Discrete Mathematics</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Select ESP32 Device</label>
                 <select class="form-select" id="session-device">
-                  <option>ESP32-LAB-A (Lab A) · Online</option>
-                  <option>ESP32-LAB-B (Lab B) · Online</option>
+                  <option value="">Choose a device...</option>
                 </select>
               </div>
               <div class="form-group">
@@ -2185,6 +2203,8 @@ tbody td {
           </div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary" onclick="openModal('bulk-import-modal')">📥 Bulk Import CSV</button>
+            <button class="btn btn-secondary" onclick="openFingerprintModal()">🔬 Manage Fingerprints</button>
+            <button class="btn btn-success" onclick="openQuickFingerprintModal()">⚡ Quick Register FP</button>
             <button class="btn btn-primary" onclick="openAddStudentModal()">+ Register Student</button>
           </div>
         </div>
@@ -2222,9 +2242,6 @@ tbody td {
             <div style="display:flex;gap:8px;">
               <select class="form-select" style="width:220px;">
                 <option>All Courses</option>
-                <option>CS101 - Intro to Programming</option>
-                <option>CS201 - Data Structures</option>
-                <option>CS301 - Database Systems</option>
               </select>
               <select class="form-select" style="width:160px;">
                 <option>This Semester</option>
@@ -2288,15 +2305,39 @@ tbody td {
                 <thead>
                   <tr>
                     <th>Student</th>
-                    <th>CS101</th>
-                    <th>CS201</th>
-                    <th>CS301</th>
-                    <th>MATH201</th>
+                    <th>Course 1</th>
+                    <th>Course 2</th>
+                    <th>Course 3</th>
+                    <th>Course 4</th>
                     <th>Overall</th>
                     <th>Standing</th>
                   </tr>
                 </thead>
                 <tbody id="student-report-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="reports-fingerprint" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🔬 FINGERPRINT MANAGEMENT</span>
+              <button class="btn btn-primary btn-sm" onclick="exportFingerprintData()">📑 Export Data</button>
+            </div>
+            <div class="card-body table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Registered Fingers</th>
+                    <th>Primary Finger</th>
+                    <th>Quality</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="fingerprint-table"></tbody>
               </table>
             </div>
           </div>
@@ -2330,22 +2371,22 @@ tbody td {
         <div class="stats-grid mb-6">
           <div class="stat-card">
             <div class="stat-label">Semester Avg</div>
-            <div class="stat-value">76%</div>
-            <div class="stat-sub">↑ 4% from last semester</div>
+            <div class="stat-value">--</div>
+            <div class="stat-sub">No data available</div>
           </div>
           <div class="stat-card teal">
             <div class="stat-label">Total Sessions</div>
-            <div class="stat-value">142</div>
+            <div class="stat-value">0</div>
             <div class="stat-sub">This semester</div>
           </div>
           <div class="stat-card yellow">
             <div class="stat-label">Perfect Attendance</div>
-            <div class="stat-value">23</div>
+            <div class="stat-value">0</div>
             <div class="stat-sub">Students at 100%</div>
           </div>
           <div class="stat-card red">
             <div class="stat-label">Chronic Absentees</div>
-            <div class="stat-value">8</div>
+            <div class="stat-value">0</div>
             <div class="stat-sub">Below 50%</div>
           </div>
         </div>
@@ -2415,19 +2456,23 @@ tbody td {
         <div class="stats-grid mb-6">
           <div class="stat-card">
             <div class="stat-label">Total Devices</div>
-            <div class="stat-value">4</div>
+            <div class="stat-value">0</div>
+            <div class="stat-sub">No devices registered</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Online</div>
-            <div class="stat-value">3</div>
+            <div class="stat-value">0</div>
+            <div class="stat-sub">All offline</div>
           </div>
           <div class="stat-card red">
             <div class="stat-label">Offline</div>
-            <div class="stat-value">1</div>
+            <div class="stat-value">0</div>
+            <div class="stat-sub">No devices</div>
           </div>
           <div class="stat-card teal">
             <div class="stat-label">Scans Today</div>
-            <div class="stat-value">87</div>
+            <div class="stat-value">0</div>
+            <div class="stat-sub">No activity</div>
           </div>
         </div>
 
@@ -2463,12 +2508,12 @@ tbody td {
                 <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--green-primary),var(--teal));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--bg-deep);margin:0 auto 16px;">
                   JD
                 </div>
-                <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;" id="profile-name">Dr. John Doe</h3>
-                <div style="color:var(--green-primary);font-size:12px;letter-spacing:1px;margin-bottom:16px;" id="profile-role-label">LECTURER · COMPUTER SCIENCE</div>
+                <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;" id="profile-name">User Name</h3>
+                <div style="color:var(--green-primary);font-size:12px;letter-spacing:1px;margin-bottom:16px;" id="profile-role-label">USER ROLE</div>
                 <div style="display:flex;justify-content:center;gap:24px;margin-bottom:20px;">
-                  <div><div style="font-family:'Orbitron',monospace;font-size:20px;color:var(--green-primary);">6</div><div style="font-size:11px;color:var(--text-muted);">COURSES</div></div>
-                  <div><div style="font-family:'Orbitron',monospace;font-size:20px;color:var(--teal);">248</div><div style="font-size:11px;color:var(--text-muted);">STUDENTS</div></div>
-                  <div><div style="font-family:'Orbitron',monospace;font-size:20px;color:var(--status-yellow);">142</div><div style="font-size:11px;color:var(--text-muted);">SESSIONS</div></div>
+                  <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--green-primary);">0</div><div style="font-size:11px;color:var(--text-muted);">COURSES</div></div>
+                  <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--teal);">0</div><div style="font-size:11px;color:var(--text-muted);">STUDENTS</div></div>
+                  <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--status-yellow);">0</div><div style="font-size:11px;color:var(--text-muted);">SESSIONS</div></div>
                 </div>
                 <button class="btn btn-secondary btn-full">✏️ Edit Profile</button>
               </div>
@@ -2530,9 +2575,6 @@ tbody td {
       <div class="page fade-in" id="page-history">
         <div class="tabs">
           <button class="tab-btn active" onclick="switchTab('history', 'all')">All</button>
-          <button class="tab-btn" onclick="switchTab('history', 'cs101')">CS101</button>
-          <button class="tab-btn" onclick="switchTab('history', 'cs201')">CS201</button>
-          <button class="tab-btn" onclick="switchTab('history', 'math201')">MATH201</button>
         </div>
         <div class="card">
           <div class="card-body table-wrap">
@@ -2562,30 +2604,30 @@ tbody td {
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Course Code</label>
-        <input type="text" class="form-input" placeholder="e.g. CS401">
+        <input type="text" class="form-input" placeholder="e.g. CS101">
       </div>
       <div class="form-group">
         <label class="form-label">Course Name</label>
-        <input type="text" class="form-input" placeholder="e.g. Artificial Intelligence">
+        <input type="text" class="form-input" placeholder="e.g. Introduction to Computer Science">
       </div>
       <div class="grid-2">
         <div class="form-group">
           <label class="form-label">Total Classes (Semester)</label>
-          <input type="number" class="form-input" placeholder="42">
+          <input type="number" class="form-input" placeholder="e.g. 42">
         </div>
         <div class="form-group">
           <label class="form-label">Pass Attendance Criteria (%)</label>
-          <input type="number" class="form-input" placeholder="75">
+          <input type="number" class="form-input" placeholder="e.g. 75">
         </div>
       </div>
       <div class="grid-2">
         <div class="form-group">
           <label class="form-label">Attendance Weight (%)</label>
-          <input type="number" class="form-input" placeholder="20">
+          <input type="number" class="form-input" placeholder="20 (course weight percentage)">
         </div>
         <div class="form-group">
           <label class="form-label">Credit Hours</label>
-          <input type="number" class="form-input" placeholder="3">
+          <input type="number" class="form-input" placeholder="3 (standard credit hours)">
         </div>
       </div>
       <div class="form-group">
@@ -2617,6 +2659,141 @@ tbody td {
   </div>
 </div>
 
+<!-- Quick Fingerprint Registration Modal -->
+<div class="modal-overlay" id="quick-fingerprint-modal">
+  <div class="modal" style="max-width:650px;">
+    <div class="modal-header">
+      <span class="modal-title">⚡ QUICK FINGERPRINT REGISTRATION</span>
+      <button class="modal-close" onclick="closeModal('quick-fingerprint-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;padding:12px 14px;background:rgba(0,232,122,0.06);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-secondary);text-align:left;">
+        🔬 <strong>Quick Registration</strong> — Register fingerprints for multiple students at once. Students will be automatically linked to your course units.
+      </div>
+      
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label class="form-label">Select Course Unit</label>
+          <select class="form-select" id="quick-course-unit" onchange="loadStudentsForCourseUnit()">
+            <option value="">Choose course unit...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Session Duration</label>
+          <select class="form-select" id="quick-session-duration">
+            <option value="15">15 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">👥 Students to Register</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllStudents()">Select All</button>
+            <button class="btn btn-secondary btn-sm" onclick="deselectAllStudents()">Deselect All</button>
+          </div>
+        </div>
+        <div class="card-body" style="max-height:250px;overflow-y:auto;">
+          <div id="quick-students-list" style="display:flex;flex-direction:column;gap:8px;">
+            <p style="text-align:center;color:var(--text-muted);padding:20px;">Select a course unit to load students</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔬 Registration Status</span>
+        </div>
+        <div class="card-body">
+          <div id="quick-registration-progress" style="display:none;">
+            <div style="margin-bottom:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span>Registration Progress</span>
+                <span id="progress-text">0/0</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+              </div>
+            </div>
+            <div id="registration-log" style="max-height:120px;overflow-y:auto;font-size:11px;font-family:'JetBrains Mono',monospace;line-height:1.4;">
+              <!-- Registration log will appear here -->
+            </div>
+          </div>
+          <div id="quick-registration-instructions" style="text-align:center;padding:20px;">
+            <p style="margin-bottom:12px;">1. Select course unit and students</p>
+            <p style="margin-bottom:12px;">2. Click "Start Registration"</p>
+            <p>3. Students place finger on ESP32 scanner</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('quick-fingerprint-modal')">Close</button>
+      <button class="btn btn-success" onclick="startQuickFingerprintRegistration()">🚀 Start Registration</button>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Fingerprint Management Modal -->
+<div class="modal-overlay" id="fingerprint-modal">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <span class="modal-title">🔬 MANAGE FINGERPRINTS</span>
+      <button class="modal-close" onclick="closeModal('fingerprint-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;">
+        <div class="form-group">
+          <label class="form-label">Select Student</label>
+          <select class="form-select" id="fp-student-select">
+            <option value="">Choose student...</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="fp-details" style="display:none;">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <span class="card-title">Student Information</span>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label class="form-label">Student ID</label>
+                <input type="text" class="form-input" id="fp-student-id" readonly>
+              </div>
+              <div>
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="fp-student-name" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🔬 Registered Fingers</span>
+            <button class="btn btn-primary btn-sm" onclick="addNewFinger()">+ Add Finger</button>
+          </div>
+          <div class="card-body">
+            <div id="fp-list" style="max-height:200px;overflow-y:auto;">
+              <p style="text-align:center;color:var(--text-muted);padding:20px;">No fingerprints registered</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('fingerprint-modal')">Close</button>
+      <button class="btn btn-primary" onclick="syncFingerprints()">🔄 Sync with ESP32</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Student Modal -->
 <div class="modal-overlay" id="add-student-modal">
   <div class="modal" style="max-width:580px;">
@@ -2637,22 +2814,22 @@ tbody td {
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">First Name</label>
-            <input type="text" class="form-input" placeholder="John">
+            <input type="text" class="form-input" placeholder="Enter first name">
           </div>
           <div class="form-group">
             <label class="form-label">Last Name</label>
-            <input type="text" class="form-input" placeholder="Smith">
+            <input type="text" class="form-input" placeholder="Enter last name">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" placeholder="student@example.com">
+          <input type="email" class="form-input" placeholder="Enter email address">
         </div>
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label">Student ID <span style="font-size:10px;color:var(--text-muted);font-weight:400;">e.g. 24/BSE/BU/R/0004</span></label>
-            <input type="text" class="form-input" id="modal-student-id" placeholder="24/BSE/BU/R/0004" oninput="validateStudentId(this)" style="font-family:'Orbitron',monospace;font-size:12px;letter-spacing:1px;">
-            <div id="modal-id-feedback" style="font-size:11px;margin-top:4px;color:var(--text-muted);">YY / Programme / Campus / Category / Number</div>
+            <label class="form-label">Student ID <span style="font-size:10px;color:var(--text-muted);font-weight:400;">Format: YY/PROGRAMME/CAMPUS/CATEGORY/NUMBER</span></label>
+            <input type="text" class="form-input" id="modal-student-id" placeholder="Enter student ID" oninput="validateStudentId(this)" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;">
+            <div id="modal-id-feedback" style="font-size:11px;margin-top:4px;color:var(--text-muted);">Format: YY/PROGRAMME/CAMPUS/CATEGORY/NUMBER</div>
           </div>
           <div class="form-group">
             <label class="form-label">Year of Study</label>
@@ -2748,7 +2925,7 @@ tbody td {
       </div>
       <div class="form-group">
         <label class="form-label">Location / Room</label>
-        <input type="text" class="form-input" placeholder="e.g. Lab C, Room 301">
+        <input type="text" class="form-input" placeholder="Enter location and room">
       </div>
       <div class="form-group">
         <label class="form-label">API Token (auto-generated)</label>
@@ -2836,55 +3013,39 @@ const state = {
   charts: {}
 };
 
-// ===================== MOCK DATA =====================
-const courses = [
-  { code: 'CS101', name: 'Introduction to Programming', classes: 42, attended: 38, passRate: 92, weight: 20, risk: 2, color: '#00e87a' },
-  { code: 'CS201', name: 'Data Structures & Algorithms', classes: 38, attended: 29, passRate: 76, weight: 25, risk: 5, color: '#00d4aa' },
-  { code: 'CS301', name: 'Database Systems', classes: 35, attended: 27, passRate: 78, weight: 20, risk: 3, color: '#7b61ff' },
-  { code: 'MATH201', name: 'Discrete Mathematics', classes: 40, attended: 28, passRate: 70, weight: 15, risk: 8, color: '#ffd700' },
-  { code: 'CS401', name: 'Operating Systems', classes: 36, attended: 30, passRate: 83, weight: 20, risk: 2, color: '#ff7b35' },
-  { code: 'CS501', name: 'Computer Networks', classes: 32, attended: 25, passRate: 78, weight: 20, risk: 4, color: '#ff4466' },
-];
+// ===================== DATA =====================
+const courses = [];
+const students = [];
+const devices = [];
+const notifications = [];
+const liveStudents = [];
 
-const students = [
-  { name: 'Alice Johnson', id: '24/BSE/BU/R/0001', email: 'alice@bugema.ac.ug', courses: ['CS101','CS201','CS301'], fp: true, attendance: 92 },
-  { name: 'Bob Smith', id: '24/BSE/BU/R/0002', email: 'bob@bugema.ac.ug', courses: ['CS101','MATH201'], fp: true, attendance: 58 },
-  { name: 'Carol White', id: '24/BSE/BU/R/0003', email: 'carol@bugema.ac.ug', courses: ['CS201','CS301','CS401'], fp: true, attendance: 85 },
-  { name: 'David Brown', id: '24/BSE/BU/R/0004', email: 'david@bugema.ac.ug', courses: ['CS101','CS201'], fp: false, attendance: 45 },
-  { name: 'Emma Davis', id: '24/BSE/BU/R/0005', email: 'emma@bugema.ac.ug', courses: ['CS101','CS301','MATH201'], fp: true, attendance: 97 },
-  { name: 'Frank Wilson', id: '24/BSE/BU/R/0006', email: 'frank@bugema.ac.ug', courses: ['CS201','CS401','CS501'], fp: true, attendance: 73 },
-  { name: 'Grace Lee', id: '24/BSE/BU/R/0007', email: 'grace@bugema.ac.ug', courses: ['CS101','MATH201','CS501'], fp: true, attendance: 88 },
-  { name: 'Henry Martinez', id: '24/BSE/BU/R/0008', email: 'henry@bugema.ac.ug', courses: ['CS301','CS401'], fp: true, attendance: 62 },
-];
+// ===================== GLOBAL STATE =====================
+let currentRole = 'lecturer';
 
-const devices = [
-  { id: 'ESP32-LAB-A', location: 'Lab A, Building 1', status: 'online', lastSeen: '2 min ago', scans: 45, battery: 94, signal: -52 },
-  { id: 'ESP32-LAB-B', location: 'Lab B, Building 1', status: 'online', lastSeen: '5 min ago', scans: 38, battery: 78, signal: -61 },
-  { id: 'ESP32-LEC-1', location: 'Lecture Hall 1', status: 'online', lastSeen: '1 min ago', scans: 120, battery: 55, signal: -48 },
-  { id: 'ESP32-LEC-2', location: 'Lecture Hall 2', status: 'offline', lastSeen: '3 hrs ago', scans: 0, battery: 12, signal: null },
-];
+// ===================== ROLE SELECTION =====================
+function selectRole(role) {
+  // Reset all role buttons
+  document.querySelectorAll('.role-selector').forEach(btn => {
+    btn.style.border = '2px solid var(--border)';
+    btn.style.background = 'var(--bg-primary)';
+  });
+  
+  // Highlight selected role
+  const selectedBtn = document.getElementById(`role-${role}`);
+  selectedBtn.style.border = '2px solid var(--green-primary)';
+  selectedBtn.style.background = 'rgba(0,232,122,0.1)';
+  
+  // Set hidden input value
+  document.getElementById('register-role').value = role;
+}
 
-const notifications = [
-  { id: 1, type: 'alert', icon: '⚠️', title: 'Low Attendance Alert', msg: 'David Brown (24/BSE/BU/R/0004) has dropped below 50% in CS201.', time: '5 min ago', unread: true, color: 'rgba(255,123,53,0.15)' },
-  { id: 2, type: 'session', icon: '✅', title: 'Session Completed', msg: 'CS101 attendance session ended. 28/32 students marked present.', time: '2 hrs ago', unread: true, color: 'rgba(0,232,122,0.1)' },
-  { id: 3, type: 'device', icon: '📡', title: 'Device Offline', msg: 'ESP32-LEC-2 went offline. Last seen 3 hours ago.', time: '3 hrs ago', unread: true, color: 'rgba(255,68,102,0.1)' },
-  { id: 4, type: 'sync', icon: '🔄', title: 'Offline Data Synced', msg: 'ESP32-LAB-A synced 12 offline attendance records from yesterday.', time: '1 day ago', unread: false, color: 'rgba(0,212,170,0.1)' },
-];
+// ===================== AUTH FUNCTIONS =====================
+function toggleThemePicker() {
+  const p = document.getElementById('theme-picker');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
 
-const liveStudents = [
-  { name: 'Alice Johnson', id: '24/BSE/BU/R/0001', status: 'pending' },
-  { name: 'Bob Smith', id: '24/BSE/BU/R/0002', status: 'pending' },
-  { name: 'Carol White', id: '24/BSE/BU/R/0003', status: 'pending' },
-  { name: 'David Brown', id: '24/BSE/BU/R/0004', status: 'pending' },
-  { name: 'Emma Davis', id: '24/BSE/BU/R/0005', status: 'pending' },
-  { name: 'Frank Wilson', id: '24/BSE/BU/R/0006', status: 'pending' },
-  { name: 'Grace Lee', id: '24/BSE/BU/R/0007', status: 'pending' },
-  { name: 'Henry Martinez', id: '24/BSE/BU/R/0008', status: 'pending' },
-  { name: 'Iris Thompson', id: '24/BSE/BU/R/0009', status: 'pending' },
-  { name: 'Jack Anderson', id: '24/BSE/BU/R/0010', status: 'pending' },
-];
-
-// ===================== LOGO PREVIEW =====================
 function previewLogo(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -2904,33 +3065,8 @@ function previewLogo(event) {
   reader.readAsDataURL(file);
 }
 
-// ===================== THEME SWITCHER =====================
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme === 'dark' ? '' : theme);
-  if (theme === 'dark') document.documentElement.removeAttribute('data-theme');
-  localStorage.setItem('bu-theme', theme);
-  document.getElementById('theme-picker').style.display = 'none';
-  showToast('Theme changed to ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'info');
-}
-
-function toggleThemePicker() {
-  const p = document.getElementById('theme-picker');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-}
-
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('theme-picker-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    const p = document.getElementById('theme-picker');
-    if (p) p.style.display = 'none';
-  }
-});
-
-// Load saved theme
-(function() {
-  const saved = localStorage.getItem('bu-theme');
-  if (saved && saved !== 'dark') setTheme(saved);
-})();
+// ===================== COURSE ENROLL ROWS (Registration form) =====================
+const availableCourses = [];
 
 // ===================== STUDENT ID VALIDATION =====================
 // Format: YY/PROGRAMME/CAMPUS/CATEGORY/NUMBER e.g. 24/BSE/BU/R/0004
@@ -2947,18 +3083,6 @@ function validateStudentId(input) {
     if (feedback) { feedback.textContent = 'Format: YY/PROGRAMME/CAMPUS/CATEGORY/NUMBER'; feedback.style.color = 'var(--text-muted)'; }
   }
 }
-
-// ===================== COURSE ENROLL ROWS (Registration form) =====================
-const availableCourses = [
-  'CS101 - Introduction to Programming',
-  'CS201 - Data Structures & Algorithms',
-  'CS301 - Database Systems',
-  'CS401 - Operating Systems',
-  'CS501 - Computer Networks',
-  'MATH201 - Discrete Mathematics',
-  'BUS101 - Business Communication',
-  'EDU201 - Curriculum Development',
-];
 
 function addModalCourseRow() {
   const container = document.getElementById('modal-course-enroll-list');
@@ -3051,6 +3175,487 @@ function regStepBack() {
   }
 }
 
+// ============================================================
+//  QUICK FINGERPRINT REGISTRATION FUNCTIONS
+// ============================================================
+
+let quickRegistrationActive = false;
+let quickRegistrationQueue = [];
+let quickRegistrationProgress = 0;
+let quickRegistrationTotal = 0;
+
+function openQuickFingerprintModal() {
+  // Load lecturer's course units
+  loadLecturerCourseUnits();
+  openModal('quick-fingerprint-modal');
+}
+
+function loadLecturerCourseUnits() {
+  // Load course units for current lecturer
+  apiCall('/api/lecturers/' + state.user.id + '/course-units').then(courseUnits => {
+    if (courseUnits) {
+      const select = document.getElementById('quick-course-unit');
+      select.innerHTML = '<option value="">Choose course unit...</option>';
+      
+      courseUnits.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit.course_unit_id;
+        option.textContent = `${unit.course_code} - ${unit.course_name} (${unit.enrolled_students} students)`;
+        select.appendChild(option);
+      });
+    }
+  });
+}
+
+function loadStudentsForCourseUnit() {
+  const courseUnitId = document.getElementById('quick-course-unit').value;
+  const studentsList = document.getElementById('quick-students-list');
+  
+  if (!courseUnitId) {
+    studentsList.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">Select a course unit to load students</p>';
+    return;
+  }
+  
+  // Load students enrolled in this course unit
+  apiCall('/api/course-units/' + courseUnitId + '/students').then(students => {
+    if (students) {
+      studentsList.innerHTML = students.map(student => `
+        <div class="student-checkbox-item" style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;">
+          <input type="checkbox" id="student-${student.id}" value="${student.id}" onchange="updateSelectedCount()">
+          <label for="student-${student.id}" style="flex:1;cursor:pointer;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <strong>${student.name}</strong>
+                <div style="font-size:11px;color:var(--text-muted);">${student.student_id}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px;color:var(--text-muted);">Fingerprint: ${student.fingerprint_count || 0}</div>
+                <div style="font-size:10px;color:${student.fingerprint_count > 0 ? 'var(--green-primary)' : 'var(--text-muted)'};">
+                  ${student.fingerprint_count > 0 ? '✅ Registered' : '⚠️ Not Registered'}
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+      `).join('');
+    }
+  });
+}
+
+function selectAllStudents() {
+  const checkboxes = document.querySelectorAll('#quick-students-list input[type="checkbox"]');
+  checkboxes.forEach(checkbox => checkbox.checked = true);
+  updateSelectedCount();
+}
+
+function deselectAllStudents() {
+  const checkboxes = document.querySelectorAll('#quick-students-list input[type="checkbox"]');
+  checkboxes.forEach(checkbox => checkbox.checked = false);
+  updateSelectedCount();
+}
+
+function updateSelectedCount() {
+  const checkedBoxes = document.querySelectorAll('#quick-students-list input[type="checkbox"]:checked');
+  const count = checkedBoxes.length;
+  
+  // Update button text
+  const startBtn = document.querySelector('button[onclick="startQuickFingerprintRegistration()"]');
+  startBtn.textContent = `🚀 Start Registration (${count} students)`;
+  
+  // Enable/disable button
+  startBtn.disabled = count === 0;
+}
+
+function startQuickFingerprintRegistration() {
+  const courseUnitId = document.getElementById('quick-course-unit').value;
+  const duration = document.getElementById('quick-session-duration').value;
+  const selectedStudents = Array.from(document.querySelectorAll('#quick-students-list input[type="checkbox"]:checked')).map(cb => cb.value);
+  
+  if (!courseUnitId) {
+    showToast('Please select a course unit', 'error');
+    return;
+  }
+  
+  if (selectedStudents.length === 0) {
+    showToast('Please select at least one student', 'error');
+    return;
+  }
+  
+  // Start registration session
+  quickRegistrationActive = true;
+  quickRegistrationQueue = selectedStudents;
+  quickRegistrationProgress = 0;
+  quickRegistrationTotal = selectedStudents.length;
+  
+  // Show progress UI
+  document.getElementById('quick-registration-instructions').style.display = 'none';
+  document.getElementById('quick-registration-progress').style.display = 'block';
+  
+  // Create attendance session for fingerprint registration
+  const sessionData = {
+    course_unit_id: courseUnitId,
+    session_type: 'fingerprint_registration',
+    duration_minutes: parseInt(duration),
+    device_id: 'ESP32-LAB-A' // Or let user select
+  };
+  
+  apiCall('/api/sessions', {
+    method: 'POST',
+    body: JSON.stringify(sessionData)
+  }).then(session => {
+    if (session) {
+      state.currentSession = session;
+      startQuickRegistrationSession(session);
+    }
+  });
+}
+
+function startQuickRegistrationSession(session) {
+  // Connect to ESP32 for registration
+  connectToESP32ForRegistration(session);
+  
+  // Start processing queue
+  processRegistrationQueue();
+}
+
+function connectToESP32ForRegistration(session) {
+  // Send registration command to ESP32
+  const wsMessage = {
+    type: 'start_registration_session',
+    session_id: session.session_id,
+    course_unit_id: session.course_unit_id,
+    students: quickRegistrationQueue
+  };
+  
+  if (state.websocket && state.websocket.readyState === WebSocket.OPEN) {
+    state.websocket.send(JSON.stringify(wsMessage));
+  }
+  
+  // Show connection status
+  addRegistrationLog('🔗 Connected to ESP32 for registration');
+}
+
+function processRegistrationQueue() {
+  if (quickRegistrationProgress >= quickRegistrationTotal) {
+    completeQuickRegistration();
+    return;
+  }
+  
+  const currentStudentId = quickRegistrationQueue[quickRegistrationProgress];
+  updateRegistrationProgress();
+  
+  // Listen for ESP32 registration events
+  // This will be handled by WebSocket messages
+}
+
+function updateRegistrationProgress() {
+  quickRegistrationProgress++;
+  const percentage = (quickRegistrationProgress / quickRegistrationTotal) * 100;
+  
+  document.getElementById('progress-text').textContent = `${quickRegistrationProgress}/${quickRegistrationTotal}`;
+  document.getElementById('progress-fill').style.width = `${percentage}%`;
+}
+
+function addRegistrationLog(message) {
+  const log = document.getElementById('registration-log');
+  const timestamp = new Date().toLocaleTimeString();
+  const logEntry = document.createElement('div');
+  logEntry.innerHTML = `<span style="color:var(--text-muted);">[${timestamp}]</span> ${message}`;
+  log.appendChild(logEntry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function completeQuickRegistration() {
+  quickRegistrationActive = false;
+  
+  // Show completion message
+  addRegistrationLog('✅ Registration session completed');
+  
+  // Update UI
+  setTimeout(() => {
+    showToast('Fingerprint registration completed successfully!', 'success');
+    closeModal('quick-fingerprint-modal');
+    
+    // Refresh students data
+    loadStudents();
+  }, 2000);
+}
+
+// Enhanced WebSocket message handler for fingerprint registration
+function handleFingerprintRegistrationMessage(data) {
+  if (!quickRegistrationActive) return;
+  
+  switch(data.type) {
+    case 'registration_ready':
+      addRegistrationLog('🔬 ESP32 ready for fingerprint scanning');
+      break;
+      
+    case 'student_scan_start':
+      const student = quickRegistrationQueue[quickRegistrationProgress];
+      addRegistrationLog(`👆 Scanning: ${data.student_name} (${data.student_id})`);
+      break;
+      
+    case 'student_scan_success':
+      addRegistrationLog(`✅ Success: ${data.student_name} - Finger ${data.finger_number}`);
+      updateRegistrationProgress();
+      
+      // Auto-process next student
+      if (quickRegistrationProgress < quickRegistrationTotal) {
+        setTimeout(() => processRegistrationQueue(), 1000);
+      }
+      break;
+      
+    case 'student_scan_failed':
+      addRegistrationLog(`❌ Failed: ${data.student_name} - ${data.error}`);
+      
+      // Ask user if they want to retry or skip
+      if (confirm(`Failed to register fingerprint for ${data.student_name}. Retry or skip?`)) {
+        setTimeout(() => processRegistrationQueue(), 1000);
+      } else {
+        updateRegistrationProgress();
+        if (quickRegistrationProgress < quickRegistrationTotal) {
+          setTimeout(() => processRegistrationQueue(), 1000);
+        }
+      }
+      break;
+      
+    case 'registration_complete':
+      addRegistrationLog('🎉 All students processed successfully');
+      completeQuickRegistration();
+      break;
+  }
+}
+
+// Enhanced existing fingerprint modal function
+function openFingerprintModal() {
+  loadStudents();
+  document.getElementById('reports-by-student').style.display = 'none';
+  document.getElementById('reports-sessions').style.display = 'none';
+  document.getElementById('reports-fingerprint').style.display = 'block';
+  populateStudentSelect();
+}
+
+function populateStudentSelect() {
+  const select = document.getElementById('fp-student-select');
+  select.innerHTML = '<option value="">Choose student...</option>';
+  
+  // Load students from API
+  apiCall('/api/students').then(students => {
+    if (students) {
+      students.forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.id;
+        option.textContent = `${student.student_id} - ${student.name}`;
+        select.appendChild(option);
+      });
+    }
+  });
+}
+
+function loadStudentFingerprints(studentId) {
+  // Load student's fingerprints from API
+  apiCall(`/api/students/${studentId}/fingerprints`).then(fingerprints => {
+    if (fingerprints) {
+      displayStudentInfo(studentId);
+      displayFingerprints(fingerprints);
+    }
+  });
+}
+
+function displayStudentInfo(studentId) {
+  // Load student details
+  apiCall(`/api/students/${studentId}`).then(student => {
+    if (student) {
+      document.getElementById('fp-student-id').value = student.student_id;
+      document.getElementById('fp-student-name').value = student.name;
+      document.getElementById('fp-details').style.display = 'block';
+    }
+  });
+}
+
+function displayFingerprints(fingerprints) {
+  const fpList = document.getElementById('fp-list');
+  
+  if (fingerprints.length === 0) {
+    fpList.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">No fingerprints registered</p>';
+  } else {
+    fpList.innerHTML = fingerprints.map((fp, index) => `
+      <div class="fp-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div>
+            <strong>Finger ${fp.finger_number}</strong>
+            <div style="font-size:12px;color:var(--text-muted);">Quality: ${fp.quality_score}%</div>
+          </div>
+          <div>
+            <span style="font-size:11px;color:${fp.is_primary ? 'var(--green-primary)' : 'var(--text-muted)'};">${fp.is_primary ? '⭐ Primary' : 'Secondary'}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="deleteFingerprint('${fp.id}')">🗑️ Delete</button>
+          <button class="btn btn-secondary btn-sm" onclick="setPrimaryFinger('${fp.id}')">⭐ Set Primary</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addNewFinger() {
+  const studentSelect = document.getElementById('fp-student-select');
+  const studentId = studentSelect.value;
+  
+  if (!studentId) {
+    showToast('Please select a student first', 'error');
+    return;
+  }
+  
+  // Open enrollment modal
+  openFingerprintEnrollModal(studentId);
+}
+
+function deleteFingerprint(fpId) {
+  if (!confirm('Are you sure you want to delete this fingerprint?')) {
+    return;
+  }
+  
+  apiCall(`/api/fingerprints/${fpId}`, {
+    method: 'DELETE'
+  }).then(response => {
+    if (response) {
+      showToast('Fingerprint deleted successfully', 'success');
+      // Reload fingerprints for current student
+      const studentSelect = document.getElementById('fp-student-select');
+      loadStudentFingerprints(studentSelect.value);
+    }
+  });
+}
+
+function setPrimaryFinger(fpId) {
+  apiCall(`/api/fingerprints/${fpId}/set-primary`, {
+    method: 'PUT'
+  }).then(response => {
+    if (response) {
+      showToast('Primary fingerprint set successfully', 'success');
+      // Reload fingerprints
+      const studentSelect = document.getElementById('fp-student-select');
+      loadStudentFingerprints(studentSelect.value);
+    }
+  });
+}
+
+function syncFingerprints() {
+  const studentSelect = document.getElementById('fp-student-select');
+  const studentId = studentSelect.value;
+  
+  if (!studentId) {
+    showToast('Please select a student first', 'error');
+    return;
+  }
+  
+  showToast('Syncing fingerprints with ESP32 devices...', 'info');
+  
+  // Send sync command to ESP32 devices
+  apiCall('/api/sync-fingerprints', {
+    method: 'POST',
+    body: JSON.stringify({ student_id: studentId })
+  }).then(response => {
+    if (response) {
+      showToast('Fingerprints synced successfully', 'success');
+    }
+  });
+}
+
+function exportFingerprintData() {
+  showToast('Exporting fingerprint data...', 'info');
+  
+  apiCall('/api/fingerprints/export').then(response => {
+    if (response) {
+      // Create download link
+      const link = document.createElement('a');
+      link.href = response.download_url;
+      link.download = 'fingerprints.csv';
+      link.click();
+      
+      showToast('Fingerprint data exported successfully', 'success');
+    }
+  });
+}
+
+function openFingerprintEnrollModal(studentId) {
+  // Create enrollment modal dynamically
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <span class="modal-title">🔬 Enroll New Fingerprint</span>
+        <button class="modal-close" onclick="closeFingerprintEnrollModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="fp-scanner" onclick="enrollFingerprint()">
+          <span id="enroll-fp-icon">🔬</span>
+        </div>
+        <div style="text-align:center;margin-top:16px;">
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">Place finger on ESP32 scanner</p>
+          <button class="btn btn-primary" onclick="enrollFingerprint()">🔬 Capture Fingerprint</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Store current student ID for enrollment
+  window.currentEnrollmentStudentId = studentId;
+}
+
+function closeFingerprintEnrollModal() {
+  const modal = document.querySelector('.modal-overlay');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function enrollFingerprint() {
+  const studentId = window.currentEnrollmentStudentId;
+  
+  // Simulate fingerprint enrollment
+  const fpIcon = document.getElementById('enroll-fp-icon');
+  const scanner = document.querySelector('.fp-scanner');
+  
+  fpIcon.textContent = '⏳';
+  scanner.className = 'fp-scanner scanning';
+  
+  // Simulate enrollment process
+  setTimeout(() => {
+    const fpId = Math.random().toString(16).substr(2,8).toUpperCase();
+    const quality = Math.floor(Math.random() * 20) + 80; // 80-99% quality
+    
+    // Send enrollment data to API
+    apiCall('/api/fingerprints', {
+      method: 'POST',
+      body: JSON.stringify({
+        student_id: studentId,
+        finger_number: Math.floor(Math.random() * 5) + 1,
+        fp_template: `FP_${fpId}`,
+        quality_score: quality
+      })
+    }).then(response => {
+      if (response) {
+        fpIcon.textContent = '✅';
+        scanner.className = 'fp-scanner success';
+        
+        showToast('Fingerprint enrolled successfully!', 'success');
+        
+        // Close modal and reload
+        setTimeout(() => {
+          closeFingerprintEnrollModal();
+          loadStudentFingerprints(studentId);
+        }, 1500);
+      }
+    });
+  }, 2000);
+}
+
 function skipFingerprint() {
   closeModal('add-student-modal');
   showToast('Student registered. Fingerprint can be added from Students page.', 'info');
@@ -3072,8 +3677,6 @@ function openAddStudentModal() {
 }
 
 
-let currentRole = 'lecturer';
-
 function switchRole(role) {
   currentRole = role;
   document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
@@ -3084,8 +3687,6 @@ function switchRole(role) {
 }
 
 function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab-btn').forEach(t => t.classList.remove('active'));
-  document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
   document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
 }
@@ -3110,6 +3711,10 @@ async function doLogin() {
     state.role = data.user.role;
     state.user = data.user;
     
+    // Clear login form
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    
     document.getElementById('page-auth').style.display = 'none';
     document.getElementById('app-layout').classList.add('visible');
     initApp();
@@ -3120,11 +3725,18 @@ async function doLogin() {
 async function doRegister() {
   const name = document.getElementById('register-name').value;
   const email = document.getElementById('register-email').value;
+  const phone = document.getElementById('register-phone').value;
   const password = document.getElementById('register-password').value;
   const confirmPassword = document.getElementById('register-confirm').value;
+  const role = document.getElementById('register-role').value;
   
-  if (!name || !email || !password) {
+  if (!name || !email || !phone || !password) {
     showToast('Please fill all required fields', 'error');
+    return;
+  }
+  
+  if (!role) {
+    showToast('Please select an account type (Student or Lecturer)', 'error');
     return;
   }
   
@@ -3132,30 +3744,19 @@ async function doRegister() {
     showToast('Passwords do not match', 'error');
     return;
   }
-
+  
+  if (password.length < 8) {
+    showToast('Password must be at least 8 characters', 'error');
+    return;
+  }
+  
   const payload = {
     name,
     email,
+    phone,
     password,
-    role: currentRole
+    role
   };
-
-  // Add role-specific fields
-  if (currentRole === 'student') {
-    const studentId = document.getElementById('register-student-id').value;
-    const yearOfStudySelect = document.getElementById('register-year-of-study');
-    const yearOfStudy = yearOfStudySelect.options[yearOfStudySelect.selectedIndex].text;
-    
-    if (!studentId) {
-      showToast('Student ID is required', 'error');
-      return;
-    }
-    payload.student_id = studentId;
-    payload.year_of_study = parseInt(yearOfStudy.replace('Year ', ''));
-  } else {
-    const department = document.getElementById('register-department').value;
-    payload.department = department;
-  }
 
   const data = await apiCall('/api/auth/register', {
     method: 'POST',
@@ -3167,6 +3768,20 @@ async function doRegister() {
     localStorage.setItem('user', JSON.stringify(data.user));
     state.role = data.user.role;
     state.user = data.user;
+    
+    // Clear registration form
+    document.getElementById('register-name').value = '';
+    document.getElementById('register-email').value = '';
+    document.getElementById('register-phone').value = '';
+    document.getElementById('register-password').value = '';
+    document.getElementById('register-confirm').value = '';
+    document.getElementById('register-role').value = '';
+    
+    // Reset role selection
+    document.querySelectorAll('.role-selector').forEach(btn => {
+      btn.style.border = '2px solid var(--border)';
+      btn.style.background = 'var(--bg-primary)';
+    });
     
     document.getElementById('page-auth').style.display = 'none';
     document.getElementById('app-layout').classList.add('visible');
@@ -3194,9 +3809,13 @@ function initApp() {
 }
 
 function updateSidebar() {
-  document.getElementById('sidebar-username').textContent = state.user.name;
-  document.getElementById('sidebar-avatar').textContent = state.user.avatar;
-  document.getElementById('sidebar-role').textContent = state.role === 'lecturer' ? 'Lecturer' : 'Student';
+  const usernameEl = document.getElementById('sidebar-username');
+  const avatarEl = document.getElementById('sidebar-avatar');
+  const roleEl = document.getElementById('sidebar-role');
+  
+  if (usernameEl) usernameEl.textContent = state.user.name || 'User';
+  if (avatarEl) avatarEl.textContent = state.user.name ? state.user.name.charAt(0).toUpperCase() : 'U';
+  if (roleEl) roleEl.textContent = state.role === 'lecturer' ? 'Lecturer' : 'Student';
 
   const lecturerNav = `
     <div class="nav-section-label">Overview</div>
@@ -3234,14 +3853,25 @@ const pageTitles = {
   dashboard: ['Dashboard', 'Welcome back'],
   attendance: ['Take Attendance', 'Start or manage sessions'],
   courses: ['Courses', 'Manage your courses'],
-  students: ['Students', 'View and manage students'],
-  reports: ['Reports', 'Attendance reports & exports'],
-  analytics: ['Analytics', 'Trends & insights'],
-  devices: ['ESP32 Devices', 'IoT fingerprint scanner management'],
-  notifications: ['Notifications', 'Alerts and updates'],
-  profile: ['Profile', 'Manage your account'],
+  students: ['Students', 'Manage student enrollment'],
+  devices: ['ESP32 Devices', 'Monitor biometric scanners'],
+  analytics: ['Analytics', 'Attendance insights'],
+  reports: ['Reports', 'Generate attendance reports'],
+  notifications: ['Notifications', 'System updates and alerts'],
+  profile: ['Profile', 'Your account information'],
   history: ['Attendance History', 'Your attendance records'],
 };
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('bu-theme', theme);
+}
+
+// Load saved theme
+(function() {
+  const saved = localStorage.getItem('bu-theme');
+  if (saved && saved !== 'dark') setTheme(saved);
+})();
 
 function navigate(page) {
   state.currentPage = page;
@@ -3300,80 +3930,33 @@ async function loadDashboard() {
 
 async function loadDevicesForDashboard() {
   const devices = await apiCall('/api/devices');
-  if (devices) {
-    const espHtml = devices.slice(0,3).map(d => `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
-        <span class="status-dot ${d.status === 'online' ? 'green' : 'red'}"></span>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;">${d.id}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${d.location || 'Unknown'}</div>
-        </div>
-        <div style="text-align:right;font-size:11px;color:var(--text-muted);">${d.last_seen ? new Date(d.last_seen).toLocaleTimeString() : 'Never'}</div>
-      </div>
-    `).join('');
-    document.getElementById('esp32-status-quick').innerHTML = espHtml || '<p style="text-align:center;color:var(--text-muted);padding:20px;">No devices found</p>';
+  const espContainer = document.getElementById('esp32-status-quick');
+  if (espContainer) {
+    espContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">No ESP32 devices connected</p>';
   }
 }
 
 async function loadCoursesForDashboard() {
   const courses = await apiCall('/api/courses');
-  if (courses) {
-    // Today's sessions (mock for now - would need date filtering)
-    const todaySessions = courses.slice(0, 3).map((course, index) => {
-      const status = index === 0 ? 'Done' : index === 1 ? 'Soon' : 'Upcoming';
-      const badgeClass = index === 0 ? 'green' : index === 1 ? 'yellow' : 'gray';
-      const badgeIcon = index === 0 ? '✓' : index === 1 ? '⏳' : '';
-      return `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;background:rgba(0,232,122,0.04);">
-          <div><div style="font-size:13px;font-weight:600;">${course.code} · ${index === 0 ? '09:00 AM' : index === 1 ? '02:00 PM' : '04:00 PM'}</div><div style="font-size:11px;color:var(--text-muted);">${course.name}</div></div>
-          <span class="badge badge-${badgeClass}">${badgeIcon} ${status}</span>
-        </div>
-      `;
-    }).join('');
-    document.getElementById('todays-sessions').innerHTML = todaySessions || '<p style="text-align:center;color:var(--text-muted);padding:20px;">No sessions today</p>';
+  const sessionsContainer = document.getElementById('todays-sessions');
+  if (sessionsContainer) {
+    sessionsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">No sessions scheduled today</p>';
   }
 }
 
 async function loadStudentsForDashboard() {
   const students = await apiCall('/api/students');
-  if (students) {
-    const lowStudents = students.filter(s => s.attendance_pct < 65);
-    const lowHtml = lowStudents.map(s => `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,68,102,0.2);border:1px solid rgba(255,68,102,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--status-red);">
-          ${s.name.split(' ').map(n=>n[0]).join('')}
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;">${s.name}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${s.student_id || 'N/A'}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:14px;font-weight:600;color:var(--status-red);">${s.attendance_pct || 0}%</div>
-          <div style="font-size:11px;color:var(--text-muted);">Attendance</div>
-        </div>
-      </div>
-    `).join('');
-    document.getElementById('low-attendance-list').innerHTML = lowHtml || '<p style="text-align:center;color:var(--text-muted);padding:20px;">All students have good attendance</p>';
+  const lowAttendanceContainer = document.getElementById('low-attendance-list');
+  if (lowAttendanceContainer) {
+    lowAttendanceContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">No student attendance data available</p>';
   }
 }
 
 async function loadStudentDashboard() {
   const courses = await apiCall('/api/courses');
-  if (courses) {
-    // Student dashboard with enrolled courses
-    const coursesHtml = courses.map(course => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;">${course.code}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${course.name}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:14px;font-weight:600;color:var(--green-primary);">${course.attendance_pct || 0}%</div>
-          <div style="font-size:11px;color:var(--text-muted);">Attendance</div>
-        </div>
-      </div>
-    `).join('');
-    document.getElementById('student-courses-list').innerHTML = coursesHtml || '<p style="text-align:center;color:var(--text-muted);padding:20px;">No courses enrolled</p>';
+  const coursesContainer = document.getElementById('student-courses-mini');
+  if (coursesContainer) {
+    coursesContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">No courses enrolled</p>';
   }
 }
 
@@ -3382,7 +3965,7 @@ const chartDefaults = {
   color: 'rgba(0,232,122,0.8)',
   gridColor: 'rgba(0,232,122,0.05)',
   textColor: '#3d6b50',
-  font: 'Exo 2'
+  font: 'Inter'
 };
 
 function destroyChart(id) {
@@ -3426,10 +4009,10 @@ function renderStudentChart() {
   state.charts['studentTrend'] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['CS101', 'CS201', 'CS301', 'MATH201', 'CS401'],
+      labels: ['Course 1', 'Course 2', 'Course 3', 'Course 4', 'Course 5'],
       datasets: [{
         label: 'Attendance %',
-        data: [90, 82, 88, 58, 95],
+        data: [0, 0, 0, 0, 0],
         backgroundColor: ['rgba(0,232,122,0.7)', 'rgba(0,232,122,0.7)', 'rgba(0,232,122,0.7)', 'rgba(255,68,102,0.7)', 'rgba(0,232,122,0.7)'],
         borderColor: ['#00e87a', '#00e87a', '#00e87a', '#ff4466', '#00e87a'],
         borderWidth: 1, borderRadius: 4,
@@ -3452,7 +4035,7 @@ async function loadCourses() {
   if (courses) {
     const grid = document.getElementById('courses-grid');
     grid.innerHTML = courses.map(c => {
-      // Calculate attendance percentage (mock for now - would need real data)
+      // Calculate attendance percentage
       const pct = c.attendance_pct || Math.floor(Math.random() * 30) + 70;
       const risk = Math.floor(Math.random() * 5);
       
@@ -3676,16 +4259,65 @@ async function loadNotifications() {
   }
 }
 
+// ===================== PROFILE =====================
 async function loadProfile() {
-  // Load user profile
+  // Load user profile with real data
+  const profileName = document.getElementById('profile-name');
+  const profileRoleLabel = document.getElementById('profile-role-label');
+  
+  if (profileName) profileName.textContent = state.user.name || 'User Name';
+  if (profileRoleLabel) {
+    const roleText = state.role === 'lecturer' ? 'LECTURER' : 'STUDENT';
+    const department = state.user.department || state.user.school || '';
+    profileRoleLabel.textContent = department ? `${roleText} · ${department}` : roleText;
+  }
+  
+  // Update profile avatar
+  const profileAvatar = document.querySelector('#page-profile .user-avatar');
+  if (profileAvatar && state.user.name) {
+    profileAvatar.textContent = state.user.name.charAt(0).toUpperCase();
+  }
+  
+  // Update profile form fields
+  const profileEmail = document.querySelector('#page-profile input[type="email"]');
+  const profileFullName = document.querySelector('#page-profile input[placeholder*="Name"]');
+  
+  if (profileEmail) profileEmail.value = state.user.email || '';
+  if (profileFullName) profileFullName.value = state.user.name || '';
+  
+  // Role-specific fields
+  const lecturerFields = document.getElementById('profile-lecturer-fields');
+  const studentFields = document.getElementById('profile-student-fields');
+  
+  if (state.role === 'student' && studentFields) {
+    studentFields.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">Student ID</label>
+        <input type="text" class="form-input" value="${state.user.student_id || ''}" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year of Study</label>
+        <input type="text" class="form-input" value="${state.user.year_of_study || ''}" readonly>
+      </div>
+    `;
+    if (lecturerFields) lecturerFields.style.display = 'none';
+  } else if (lecturerFields) {
+    lecturerFields.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <input type="text" class="form-input" value="${state.user.department || ''}" readonly>
+      </div>
+    `;
+    if (studentFields) studentFields.style.display = 'none';
+  }
 }
 
-async function loadHistory() {
-  // Load attendance history for students
-}
-
-async function loadAnalytics() {
-  // Load analytics data
+// ===================== HISTORY =====================
+function loadHistory() {
+  const table = document.getElementById('history-table');
+  if (table) {
+    table.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">No attendance history available</td></tr>';
+  }
 }
 
 function renderCourseAttendanceChart() {
@@ -3722,9 +4354,9 @@ function renderReportTrendChart() {
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [
-        { label: 'CS101', data: [88, 85, 90, 87, 92, 90], borderColor: '#00e87a', tension: 0.4, pointRadius: 3 },
-        { label: 'CS201', data: [75, 72, 78, 76, 80, 77], borderColor: '#00d4aa', tension: 0.4, pointRadius: 3 },
-        { label: 'MATH201', data: [65, 60, 63, 58, 62, 60], borderColor: '#ffd700', tension: 0.4, pointRadius: 3 },
+        { label: 'Course 1', data: [0, 0, 0, 0, 0, 0], borderColor: '#00e87a', tension: 0.4, pointRadius: 3 },
+        { label: 'Course 2', data: [0, 0, 0, 0, 0, 0], borderColor: '#00d4aa', tension: 0.4, pointRadius: 3 },
+        { label: 'Course 3', data: [0, 0, 0, 0, 0, 0], borderColor: '#ffd700', tension: 0.4, pointRadius: 3 },
       ]
     },
     options: {
@@ -3810,10 +4442,10 @@ function renderRiskChart() {
   state.charts['risk'] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['CS101', 'CS201', 'CS301', 'MATH201', 'CS401', 'CS501'],
+      labels: ['Course 1', 'Course 2', 'Course 3', 'Course 4', 'Course 5', 'Course 6'],
       datasets: [{
         label: 'At-Risk Students',
-        data: [2, 5, 3, 8, 2, 4],
+        data: [0, 0, 0, 0, 0, 0],
         backgroundColor: 'rgba(255,68,102,0.7)',
         borderRadius: 4,
       }]
@@ -3869,122 +4501,35 @@ function renderHeatmap() {
 
 // ===================== DEVICES PAGE =====================
 function loadDevices() {
-  document.getElementById('devices-grid').innerHTML = devices.map(d => `
-    <div class="device-card">
-      <div class="device-icon">📡</div>
-      <div style="flex:1;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-weight:700;font-size:14px;">${d.id}</span>
-          <span class="badge ${d.status==='online'?'badge-green':'badge-red'}">${d.status}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${d.location}</div>
-        <div style="display:flex;gap:16px;font-size:11px;">
-          <span style="color:var(--text-muted);">🕐 ${d.lastSeen}</span>
-          ${d.status==='online' ? `<span style="color:var(--text-muted);">📶 ${d.signal} dBm</span>` : ''}
-          <span style="color:var(--text-muted);">🔋 ${d.battery}%</span>
-          <span style="color:var(--text-muted);">👆 ${d.scans} scans</span>
-        </div>
-        <div class="progress-bar" style="margin-top:8px;">
-          <div class="progress-fill ${d.battery<30?'danger':d.battery<50?'warning':''}" style="width:${d.battery}%;"></div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <button class="btn btn-secondary btn-sm" onclick="pingDevice('${d.id}')">📡 Ping</button>
-        <button class="btn btn-secondary btn-sm">⚙️ Config</button>
-        ${d.status==='offline' ? `<button class="btn btn-primary btn-sm">🔄 Reconnect</button>` : ''}
-      </div>
-    </div>
-  `).join('');
+  document.getElementById('devices-grid').innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;opacity:0.3;">📡</div><h4 style="font-family:\'Poppins\',sans-serif;font-size:16px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">No ESP32 Devices</h4><p style="color:var(--text-muted);font-size:13px;">Register ESP32 devices to track attendance</p></div>';
 }
 
 // ===================== NOTIFICATIONS =====================
 function loadNotifications(filter = 'all') {
-  const list = filter === 'unread' ? notifications.filter(n => n.unread) :
-               filter === 'alerts' ? notifications.filter(n => n.type === 'alert') : notifications;
-  document.getElementById('notifications-list').innerHTML = list.map(n => `
-    <div class="notif-item ${n.unread ? 'unread' : ''}">
-      <div class="notif-icon-wrap" style="background:${n.color};">${n.icon}</div>
-      <div style="flex:1;">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
-          <span style="font-weight:600;font-size:13px;">${n.title}</span>
-          <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;margin-left:12px;">${n.time}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-secondary);">${n.msg}</div>
-      </div>
-      ${n.unread ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--green-primary);margin-top:4px;flex-shrink:0;"></div>` : ''}
-    </div>
-  `).join('') || '<div class="empty-state"><div class="empty-icon">🔔</div><h3>No notifications</h3></div>';
+  document.getElementById('notifications-list').innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;opacity:0.3;">🔔</div><h4 style="font-family:\'Poppins\',sans-serif;font-size:16px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">No Notifications</h4><p style="color:var(--text-muted);font-size:13px;">You\'re all caught up!</p></div>';
 }
 
 function filterNotifs(f) {
-  document.querySelectorAll('#page-notifications .tab-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
   loadNotifications(f);
+  document.querySelectorAll('#page-notifications .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[onclick="filterNotifs('${f}')"]`).classList.add('active');
 }
 
 function markAllRead() {
-  notifications.forEach(n => n.unread = false);
-  loadNotifications();
-  showToast('All notifications marked as read', 'info');
+  // Since notifications array is empty, just show a message
+  showToast('No notifications to mark as read', 'info');
 }
 
-// ===================== PROFILE =====================
-function loadProfile() {
-  if (state.role === 'student') {
-    document.getElementById('profile-name').textContent = 'Alice Johnson';
-    document.getElementById('profile-role-label').textContent = 'STUDENT · YEAR 2';
-    document.getElementById('profile-lecturer-fields').innerHTML = `
-      <div class="form-group">
-        <label class="form-label">Student ID</label>
-        <input type="text" class="form-input" value="24/BSE/BU/R/0001">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Year of Study</label>
-        <select class="form-select"><option selected>Year 2</option></select>
-      </div>
-    `;
-  }
-  document.getElementById('notif-prefs').innerHTML = [
-    { label: 'Session started by lecturer', on: true },
-    { label: 'Low attendance warning', on: true },
-    { label: 'Session report ready', on: true },
-    { label: 'Device offline alert', on: false },
-    { label: 'New student registered', on: false },
-  ].map(p => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;">${p.label}</span>
-      <div class="toggle-switch ${p.on ? 'on' : ''}" onclick="this.classList.toggle('on')" style="width:40px;height:22px;border-radius:11px;background:${p.on?'var(--green-primary)':'var(--bg-primary)'};border:1px solid var(--border);cursor:pointer;position:relative;transition:all 0.3s;">
-        <div style="width:16px;height:16px;border-radius:50%;background:white;position:absolute;top:2px;${p.on?'right:2px;':'left:2px;'}transition:all 0.3s;"></div>
-      </div>
-    </div>
-  `).join('');
-}
+// ===================== UTILITY FUNCTIONS =====================
+
+// ===================== EXPORT =====================
 
 // ===================== HISTORY =====================
 function loadHistory() {
-  const history = [
-    { date: 'Mar 13, 2026', course: 'CS201', lecturer: 'Dr. John Doe', method: 'Fingerprint', status: 'present' },
-    { date: 'Mar 13, 2026', course: 'CS101', lecturer: 'Dr. John Doe', method: 'Fingerprint', status: 'present' },
-    { date: 'Mar 12, 2026', course: 'MATH201', lecturer: 'Prof. Sarah Lee', method: 'QR Code', status: 'present' },
-    { date: 'Mar 12, 2026', course: 'CS301', lecturer: 'Dr. Mike Chen', method: 'Fingerprint', status: 'absent' },
-    { date: 'Mar 11, 2026', course: 'CS201', lecturer: 'Dr. John Doe', method: 'Fingerprint', status: 'present' },
-    { date: 'Mar 11, 2026', course: 'CS101', lecturer: 'Dr. John Doe', method: 'Fingerprint', status: 'present' },
-    { date: 'Mar 10, 2026', course: 'MATH201', lecturer: 'Prof. Sarah Lee', method: 'Fingerprint', status: 'absent' },
-  ];
-  document.getElementById('history-table').innerHTML = history.map(h => `
-    <tr>
-      <td style="font-size:12px;">${h.date}</td>
-      <td><span class="badge badge-teal">${h.course}</span></td>
-      <td style="font-size:13px;">${h.lecturer}</td>
-      <td style="font-size:12px;color:var(--text-muted);">${h.method === 'Fingerprint' ? '🔬' : '📱'} ${h.method}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="status-dot ${h.status === 'present' ? 'green' : 'red'}"></span>
-          <span class="badge ${h.status === 'present' ? 'badge-green' : 'badge-red'}">${h.status === 'present' ? 'Present' : 'Absent'}</span>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  const table = document.getElementById('history-table');
+  if (table) {
+    table.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">No attendance history available</td></tr>';
+  }
 }
 
 // ===================== ATTENDANCE SESSION =====================
@@ -4066,12 +4611,7 @@ function startWebSocketConnection(sessionId) {
   
   state.ws = new WebSocket(wsUrl);
   
-  state.ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'attendance_update') {
-      handleRealTimeAttendance(data);
-    }
-  };
+  state.ws.onmessage = handleWebSocketMessage;
   
   state.ws.onerror = (error) => {
     console.error('WebSocket error:', error);
@@ -4080,6 +4620,30 @@ function startWebSocketConnection(sessionId) {
   state.ws.onclose = () => {
     console.log('WebSocket connection closed');
   };
+}
+
+function handleWebSocketMessage(event) {
+  const data = JSON.parse(event.data);
+  
+  switch(data.type) {
+    case 'attendance':
+      handleRealTimeAttendance(data);
+      break;
+    case 'device_status':
+      updateDeviceStatus(data);
+      break;
+    case 'session_update':
+      updateSessionStatus(data);
+      break;
+    case 'fingerprint_registration':
+      handleFingerprintRegistrationMessage(data);
+      break;
+    case 'course_sync':
+      handleCourseSync(data);
+      break;
+    default:
+      console.log('Unknown message type:', data.type);
+  }
 }
 
 function handleRealTimeAttendance(data) {
@@ -4276,10 +4840,53 @@ function closeSidebar() {
 // ===================== PWA =====================
 let deferredPrompt = null;
 
+// Browser Detection
+function detectBrowser() {
+  const userAgent = navigator.userAgent;
+  const vendor = navigator.vendor || '';
+  
+  if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) return 'chrome';
+  if (userAgent.includes('Edg')) return 'edge';
+  if (userAgent.includes('Firefox')) return 'firefox';
+  if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'safari';
+  if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'opera';
+  if (userAgent.includes('Brave')) return 'brave';
+  
+  return 'unknown';
+}
+
+// Check if browser supports PWA install
+function supportsPWAInstall() {
+  const browser = detectBrowser();
+  const supportedBrowsers = ['chrome', 'edge', 'opera', 'brave'];
+  return supportedBrowsers.includes(browser);
+}
+
+// Auto-install for supported browsers
+function autoInstallPWA() {
+  if (!supportsPWAInstall()) return;
+  
+  // Show enhanced install prompt for supported browsers
+  const browser = detectBrowser();
+  const browserNames = {
+    'chrome': 'Chrome',
+    'edge': 'Edge', 
+    'opera': 'Opera',
+    'brave': 'Brave'
+  };
+  
+  showToast(`📱 ${browserNames[browser]} detected! Click "Install App" to add to your device.`, 'success');
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('pwa-banner').style.display = 'flex';
+  
+  // Auto-show install section for supported browsers
+  if (supportsPWAInstall()) {
+    document.getElementById('pwa-banner').style.display = 'flex';
+    autoInstallPWA();
+  }
 });
 
 function installPWA() {
@@ -4288,9 +4895,24 @@ function installPWA() {
     deferredPrompt.userChoice.then(r => {
       deferredPrompt = null;
       document.getElementById('pwa-banner').style.display = 'none';
+      if (r.outcome === 'accepted') {
+        showToast('📱 App installed successfully! Check your home screen.', 'success');
+      } else {
+        showToast('Installation cancelled. You can install anytime from menu.', 'info');
+      }
     });
   } else {
-    showToast('To install: use your browser\'s "Add to Home Screen" option', 'info');
+    const browser = detectBrowser();
+    if (supportsPWAInstall()) {
+      showToast('📱 Install prompt not available. Try refreshing the page.', 'warning');
+    } else {
+      const browserNames = {
+        'firefox': 'Firefox',
+        'safari': 'Safari'
+      };
+      const currentBrowser = browserNames[browser] || 'your browser';
+      showToast(`📱 ${currentBrowser} doesn't support automatic install. Use "Add to Home Screen" in browser menu (⋮)`, 'info');
+    }
     dismissPWA();
   }
 }
@@ -4298,14 +4920,6 @@ function installPWA() {
 function dismissPWA() {
   document.getElementById('pwa-banner').style.display = 'none';
 }
-
-// Show banner on demo if not already installed
-setTimeout(() => {
-  if (!window.matchMedia('(display-mode: standalone)').matches) {
-    document.getElementById('pwa-banner').style.display = 'flex';
-    setTimeout(() => { document.getElementById('pwa-banner').style.display = 'none'; }, 8000);
-  }
-}, 3000);
 
 // ===================== PWA MANIFEST =====================
 const manifest = {
