@@ -7,6 +7,7 @@
     "start": "node mysql-server.js",
     "dev": "nodemon mysql-server.js",
     "frontend:install": "cd frontend && npm install",
+    "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "build": "npm run frontend:install && npm run frontend:build",
     "postinstall": "npm run frontend:install"
