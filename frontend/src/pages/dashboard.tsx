@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { GraduationCap, Users, Cpu, PlayCircle } from "lucide-react";
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState(true);
   const [stats, setStats] = React.useState<{
     courses: number;
@@ -50,9 +52,6 @@ export function DashboardPage() {
             Monitor biometric sessions, student coverage, and device health at a glance.
           </p>
         </div>
-        <Badge variant="outline" className="self-start">
-          Signed in as <span className="mx-1 font-semibold">{formatRole(user?.role || "")}</span>
-        </Badge>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -111,16 +110,50 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3 pt-4">
-            <Button size="lg" className="gap-2">
+            <Button size="lg" className="gap-2" onClick={() => navigate("/courses")}>
               <PlayCircle className="h-4 w-4" />
               Start attendance session
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate("/courses")}>
               View courses
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate("/students")}>
               View students
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>
+              Latest biometric scans from terminals.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground pb-4">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center border-b border-border/40 pb-2">
+                <div>
+                  <div className="text-slate-200">Alice Johnson</div>
+                  <div className="text-xs">ENG-101 (ESP32-Hall-A)</div>
+                </div>
+                <div className="text-xs text-sky-300">2 mins ago</div>
+              </div>
+              <div className="flex justify-between items-center border-b border-border/40 pb-2">
+                <div>
+                  <div className="text-slate-200">Sewankambo Erma</div>
+                  <div className="text-xs">CS-302 (ESP32-Lab-1)</div>
+                </div>
+                <div className="text-xs text-sky-300">14 mins ago</div>
+              </div>
+              <div className="flex justify-between items-center border-b border-border/40 pb-2">
+                <div>
+                  <div className="text-slate-200">James Cole</div>
+                  <div className="text-xs">Admin Login (Web)</div>
+                </div>
+                <div className="text-xs text-sky-300">1 hour ago</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

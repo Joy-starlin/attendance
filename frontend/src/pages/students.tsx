@@ -4,12 +4,22 @@ import { api, ApiError, Student } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Users, RefreshCw, Search } from "lucide-react";
 
 export function StudentsPage() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [students, setStudents] = React.useState<Student[]>([]);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredStudents = React.useMemo(() => {
+    return students.filter((s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.student_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.year_of_study?.toString().includes(searchQuery)
+    );
+  }, [students, searchQuery]);
 
   const load = React.useCallback(async () => {
     setError(null);
@@ -41,10 +51,19 @@ export function StudentsPage() {
             Manage student profiles and biometric enrollments.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 w-full sm:w-80 border border-border/60 rounded-md bg-background/50 focus-within:ring-1 focus-within:ring-sky-500">
+          <Search className="ml-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search by name, ID, or year..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border-0 bg-transparent focus-visible:ring-0 shadow-none"
+          />
+          <Button variant="ghost" size="icon" className="mr-1 rounded-sm text-muted-foreground" onClick={load} disabled={loading}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -60,8 +79,8 @@ export function StudentsPage() {
             <CardDescription>
               {loading
                 ? "Loading..."
-                : `${students.length.toLocaleString()} student${
-                    students.length === 1 ? "" : "s"
+                : `${filteredStudents.length.toLocaleString()} student${
+                    filteredStudents.length === 1 ? "" : "s"
                   } found.`}
             </CardDescription>
           </div>
@@ -89,8 +108,17 @@ export function StudentsPage() {
                       No students found.
                     </td>
                   </tr>
+                ) : filteredStudents.length === 0 && !loading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-3 py-6 text-center text-xs text-muted-foreground"
+                    >
+                      No students match your search query.
+                    </td>
+                  </tr>
                 ) : (
-                  students.map((s) => (
+                  filteredStudents.map((s) => (
                     <tr
                       key={s.id}
                       className="border-b border-border/40 last:border-0 hover:bg-secondary/40"

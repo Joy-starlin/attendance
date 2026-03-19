@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { formatRole } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -40,8 +41,10 @@ function AppTopBar() {
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
-            <div className="text-sm font-medium leading-none">{user?.name}</div>
-            <div className="text-xs text-muted-foreground">{user?.email}</div>
+            <div className="text-sm font-medium leading-none mb-1">{user?.name}</div>
+            <div className="text-xs text-muted-foreground capitalize">
+              {user?.role ? formatRole(user.role) : ""} &bull; {user?.email}
+            </div>
           </div>
           <Button
             variant="outline"
