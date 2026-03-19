@@ -38,7 +38,7 @@ export function StudentsPage() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Students</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Browse student profiles captured in the biometric records.
+            Manage student profiles and biometric enrollments.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -59,7 +59,7 @@ export function StudentsPage() {
             <CardTitle>Registered students</CardTitle>
             <CardDescription>
               {loading
-                ? "Loading from MySQL…"
+                ? "Loading..."
                 : `${students.length.toLocaleString()} student${
                     students.length === 1 ? "" : "s"
                   } found.`}
@@ -86,8 +86,7 @@ export function StudentsPage() {
                       colSpan={5}
                       className="px-3 py-6 text-center text-xs text-muted-foreground"
                     >
-                      No students found yet. Once you import from your SIS or register
-                      manually, they will appear here.
+                      No students found.
                     </td>
                   </tr>
                 ) : (

@@ -14,7 +14,7 @@ export function SettingsPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Environment-aware configuration for the Bugema Attendance console.
+          System configuration and preferences.
         </p>
       </div>
 
@@ -46,25 +46,7 @@ export function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Visual system</CardTitle>
-            <CardDescription>
-              Typography and theming tuned for monitoring dashboards.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <p>
-              The console uses a dark, low-noise palette with subtle gradients and
-              elevation. Layout spacing is consistent on an 8px grid; headings use
-              medium weight to stay legible on projectors and in lecture halls.
-            </p>
-            <p>
-              If you want, I can add light mode, per-role themes, or campus-specific
-              branding as a follow-up.
-            </p>
-          </CardContent>
-        </Card>
+
       </div>
     </div>
   );

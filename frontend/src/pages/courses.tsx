@@ -37,7 +37,7 @@ export function CoursesPage() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Courses</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            View lecture units registered in the biometric attendance system.
+            Manage your lecture units.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
@@ -58,7 +58,7 @@ export function CoursesPage() {
             <CardTitle>Configured courses</CardTitle>
             <CardDescription>
               {loading
-                ? "Loading from MySQL…"
+                ? "Loading..."
                 : `${courses.length.toLocaleString()} course${
                     courses.length === 1 ? "" : "s"
                   } found.`}
@@ -85,8 +85,7 @@ export function CoursesPage() {
                       colSpan={5}
                       className="px-3 py-6 text-center text-xs text-muted-foreground"
                     >
-                      No courses found yet. Once you seed data in MySQL, they will appear
-                      here automatically.
+                      No courses found. Create a course to get started.
                     </td>
                   </tr>
                 ) : (

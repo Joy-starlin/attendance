@@ -46,10 +46,10 @@ export function LoginPage() {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950/70 text-sky-400 ring-1 ring-sky-500/40">
             <Fingerprint className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">
-            Bugema Attendance Console
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-50 mb-1">
+            Bugema Attendance
           </h1>
-          <p className="mt-1 text-sm text-slate-300">
+          <p className="text-sm text-slate-300">
             Sign in to manage courses, sessions, and biometric attendance.
           </p>
         </div>
@@ -57,7 +57,7 @@ export function LoginPage() {
           <CardHeader>
             <CardTitle>Welcome back</CardTitle>
             <CardDescription>
-              Use your admin or lecturer credentials provided by ICT.
+              Enter your credentials to continue.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -103,8 +103,7 @@ export function LoginPage() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col items-start justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
-            <span>Access is restricted to Bugema staff and admins.</span>
+          <CardFooter className="flex justify-center text-xs text-muted-foreground">
             <Link
               to="/register"
               className="font-medium text-sky-300 hover:text-sky-200"
@@ -113,9 +112,6 @@ export function LoginPage() {
             </Link>
           </CardFooter>
         </Card>
-        <p className="mt-4 text-center text-xs text-slate-400">
-          Designed for real-world biometric deployments: resilient, auditable, and fast.
-        </p>
       </div>
     </div>
   );

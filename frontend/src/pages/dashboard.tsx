@@ -41,7 +41,7 @@ export function DashboardPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
-            Attendance intelligence
+            System Overview
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             Welcome back, {user?.name}
@@ -66,7 +66,7 @@ export function DashboardPage() {
               {loading ? "—" : stats.courses.toLocaleString()}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Teaching units configured in MySQL.
+              Active teaching units.
             </p>
           </CardContent>
         </Card>
@@ -80,7 +80,7 @@ export function DashboardPage() {
               {loading ? "—" : stats.students.toLocaleString()}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Active profiles with attendance records.
+              Total registered profiles.
             </p>
           </CardContent>
         </Card>
@@ -94,13 +94,13 @@ export function DashboardPage() {
               {loading ? "—" : stats.devices.toLocaleString()}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              ESP32 biometric units connected to campus.
+              Connected biometric units.
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
         <Card className="gradient-border-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
@@ -128,19 +128,11 @@ export function DashboardPage() {
           <CardHeader>
             <CardTitle>Realtime signal</CardTitle>
             <CardDescription>
-              WebSocket events stream from ESP32 devices into this dashboard.
+              Live activity feed from connected biometric units.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-xs text-muted-foreground">
-            <p>
-              When a student taps a fingerprint, the event is written to MySQL and
-              pushed to this console over WebSockets so you can monitor attendance as it
-              happens.
-            </p>
-            <p>
-              The UI stays responsive even under load, with minimal visual noise and
-              clear typography for lecture halls and control rooms.
-            </p>
+          <CardContent className="text-sm text-muted-foreground">
+            <p>Waiting for incoming session data...</p>
           </CardContent>
         </Card>
       </div>

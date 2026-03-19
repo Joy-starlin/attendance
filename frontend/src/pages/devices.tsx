@@ -83,7 +83,7 @@ export function DevicesPage() {
             <CardTitle>Registered devices</CardTitle>
             <CardDescription>
               {loading
-                ? "Loading from MySQL…"
+                ? "Loading..."
                 : `${devices.length.toLocaleString()} device${
                     devices.length === 1 ? "" : "s"
                   } found.`}
@@ -111,8 +111,7 @@ export function DevicesPage() {
                       colSpan={6}
                       className="px-3 py-6 text-center text-xs text-muted-foreground"
                     >
-                      No devices registered yet. Once ESP32 units authenticate, they will
-                      appear here.
+                      No biometric devices registered.
                     </td>
                   </tr>
                 ) : (
