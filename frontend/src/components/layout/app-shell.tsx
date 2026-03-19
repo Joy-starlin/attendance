@@ -42,8 +42,8 @@ function AppTopBar() {
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <div className="text-sm font-medium leading-none mb-1">{user?.name}</div>
-            <div className="text-xs text-muted-foreground capitalize">
-              {user?.role ? formatRole(user.role) : ""} &bull; {user?.email}
+            <div className="text-xs text-muted-foreground">
+              <span className="capitalize">{user?.role ? formatRole(user.role) : ""}</span> &bull; {user?.email}
             </div>
           </div>
           <Button
