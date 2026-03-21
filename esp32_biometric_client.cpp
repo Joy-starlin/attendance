@@ -1,11 +1,20 @@
 #include <WiFi.h>
+#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <Adafruit_Fingerprint.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 // --- CONFIGURATION ---
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+// WiFi credentials removed! Handled by WiFiManager AP.
+
+// OLED Display Configuration
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET    -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // API Server Details
 // Important: Cannot use 'localhost' here. Use the IPv4 address of your computer running the Node server.
@@ -38,19 +47,44 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   }
 }
 
+void updateDisplay(String text) {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println(text);
+  display.display();
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
   
-  // 1. Connect to WiFi
-  Serial.println("\nConnecting to WiFi...");
-  WiFi.begin(ssid, password);
-  while(WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  // 0. Initialize OLED
+  Wire.begin(); 
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Default I2C address 0x3C
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
   }
+  updateDisplay("Starting Up...");
+  
+  // 1. Connect to WiFi using WiFiManager
+  Serial.println("\nStarting WiFiManager...");
+  updateDisplay("WiFi Setup\nConnect to AP:\nBiometric-Scanner");
+  
+  WiFiManager wm;
+  bool res = wm.autoConnect("Biometric-Scanner"); // Creates AP if no saved WiFi
+  if(!res) {
+    Serial.println("Failed to connect to WiFi and hit timeout");
+    updateDisplay("WiFi Failed!\nRestarting...");
+    delay(3000);
+    ESP.restart();
+  } 
+  
   Serial.println("\nWiFi Connected! IP Address: ");
   Serial.println(WiFi.localIP());
+  updateDisplay("WiFi Connected!\n" + WiFi.localIP().toString());
+  delay(2000);
 
   // 2. Initialize Fingerprint Sensor
   Serial.println("\nInitializing Fingerprint Sensor...");

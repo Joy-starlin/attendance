@@ -20,6 +20,7 @@ const PORT = Number(process.env.PORT || 3008);
 // Middleware
 app.use(cors());
 app.use(express.json());
+const deviceCommands = new Map(); // id -> { command: string, student_id: string }
 
 // Serve the built React frontend if present (prod mode)
 const FRONTEND_DIST = path.join(__dirname, 'frontend', 'dist');
@@ -305,6 +306,61 @@ app.post('/api/auth/login', async (req, res) => {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Database error' });
   }
+});
+
+// DEVICE LIVE COMMANDS & ENROLLMENT
+app.post('/api/devices/:id/enroll', authMiddleware, async (req, res) => {
+  const { student_id } = req.body;
+  if (!student_id) return res.status(400).json({ error: 'student_id is required' });
+  
+  deviceCommands.set(req.params.id, { command: 'ENROLL', student_id });
+  console.log(`[DEVICE] Enrollment queued for device ${req.params.id}, student ${student_id}`);
+  res.json({ success: true, message: 'Enrollment command sent to device' });
+});
+
+app.post('/v1/device/heartbeat', async (req, res) => {
+  const { device_id, session_active, offline_queue } = req.body;
+  
+  // Update device status in DB
+  try {
+    await pool.execute(
+      `INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online')
+       ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'`,
+      [device_id]
+    );
+  } catch (err) {
+    console.error('Heartbeat DB error:', err);
+  }
+
+  // Check for pending commands
+  const pending = deviceCommands.get(device_id);
+  if (pending) {
+    deviceCommands.delete(device_id); // One-time command
+    return res.json({ command: pending.command, student_id: pending.student_id });
+  }
+
+  res.json({ status: 'ok', server_time: new Date().toISOString() });
+});
+
+app.post('/v1/device/log', async (req, res) => {
+  const { device_id, status, message, student_id } = req.body;
+  console.log(`[LIVE-LOG] ${device_id}: ${status} - ${message}`);
+  
+  // Global broadcast to all WebSockets (or filter by specific session/student if needed)
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({
+        type: 'device_log',
+        device_id,
+        status,
+        message,
+        student_id,
+        timestamp: new Date().toISOString()
+      }));
+    }
+  });
+  
+  res.json({ ok: true });
 });
 
 app.post('/api/auth/register', async (req, res) => {

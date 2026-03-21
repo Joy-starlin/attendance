@@ -92,8 +92,8 @@ export function DevicesPage() {
           <Cpu className="h-5 w-5 text-violet-300" />
         </CardHeader>
         <CardContent>
-          <div className="overflow-hidden rounded-lg border border-border/60 bg-background/40">
-            <table className="min-w-full border-collapse text-sm">
+          <div className="overflow-x-auto rounded-lg border border-border/60 bg-background/40">
+            <table className="min-w-full border-collapse text-sm whitespace-nowrap">
               <thead>
                 <tr className="border-b border-border/60 bg-secondary/40 text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2 text-left font-medium">ID</th>

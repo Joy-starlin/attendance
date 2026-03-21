@@ -164,5 +164,10 @@ export const api = {
         type: string;
       }>
     >("/api/devices"),
+  enrollDevice: (deviceId: string, studentId: string) =>
+    request<{ success: true }> (`/api/devices/${deviceId}/enroll`, {
+      method: "POST",
+      body: JSON.stringify({ student_id: studentId }),
+    }),
 };
 

@@ -123,6 +123,7 @@ bool apMode           = false;
 bool configMode        = false;
 String currentSessionId = "";
 String currentCourseId  = "";
+String currentEnrollStudentId = ""; // Student currently being enrolled via Live flow
 
 // Offline queue (when WiFi is down, store locally)
 struct AttendRecord {
@@ -249,8 +250,8 @@ void loop() {
     lastWiFiCheck = millis();
   }
 
-  // Heartbeat every 60 seconds (only if WiFi connected)
-  if (millis() - lastHeartbeat > 60000 && wifiConnected) {
+  // Heartbeat every 10 seconds for faster command response
+  if (millis() - lastHeartbeat > 10000 && wifiConnected) {
     sendHeartbeat();
     lastHeartbeat = millis();
   }
@@ -521,43 +522,56 @@ uint8_t getFingerprintID() {
 //  ENROLL LOOP (Register new fingerprint)
 // ============================================================
 void enrollLoop() {
-  oledMsg("ENROLL MODE", "Enter ID via BT", "or press ENROLL");
+  oledMsg("ENROLL MODE", "Waiting for finger", currentEnrollStudentId);
+  sendLog("START", "Entering enrollment mode for " + currentEnrollStudentId);
 
   // Get next available slot
   int id = getNextFreeSlot();
   if (id < 0) {
     oledMsg("MEMORY FULL", "Delete old FPs", "first");
+    sendLog("ERROR", "Sensor memory full");
     flashRed(3);
     currentMode = MODE_IDLE;
     return;
   }
 
   oledMsg("ENROLLING", "Slot #" + String(id), "Scan finger x2");
+  sendLog("WAITING_FOR_SCAN_1", "Please place finger on sensor");
   delay(1000);
 
   // First scan
-  oledMsg("SCAN 1/2", "Place finger", "firmly on sensor");
   while (finger.getImage() != FINGERPRINT_OK) {
     delay(200);
-    if (digitalRead(BTN_ENROLL) == LOW) { currentMode = MODE_IDLE; return; }
+    if (digitalRead(BTN_ENROLL) == LOW) { 
+      sendLog("CANCELLED", "Enrollment cancelled by button");
+      currentMode = MODE_IDLE; 
+      return; 
+    }
   }
   finger.image2Tz(1);
   oledMsg("SCAN 1/2 OK", "Lift finger", "");
+  sendLog("SCAN_1_OK", "First scan successful. Please lift finger.");
   delay(1500);
 
   while (finger.getImage() != FINGERPRINT_NOFINGER) delay(200);
 
   // Second scan
   oledMsg("SCAN 2/2", "Place same finger", "again");
+  sendLog("WAITING_FOR_SCAN_2", "Please place the same finger again.");
   while (finger.getImage() != FINGERPRINT_OK) {
     delay(200);
-    if (digitalRead(BTN_ENROLL) == LOW) { currentMode = MODE_IDLE; return; }
+    if (digitalRead(BTN_ENROLL) == LOW) { 
+      sendLog("CANCELLED", "Enrollment cancelled by button");
+      currentMode = MODE_IDLE; 
+      return; 
+    }
   }
   finger.image2Tz(2);
 
   uint8_t p = finger.createModel();
   if (p != FINGERPRINT_OK) {
     oledMsg("ENROLL FAILED", "Scans didn't match", "Try again");
+    sendLog("ERROR_MATCH", "Fingerprint scans did not match. Try again.");
     flashRed(3);
     currentMode = MODE_IDLE;
     return;
@@ -566,25 +580,35 @@ void enrollLoop() {
   p = finger.storeModel(id);
   if (p == FINGERPRINT_OK) {
     oledMsg("ENROLLED!", "FP ID: #" + String(id), "Saved to sensor");
+    sendLog("SUCCESS", "Fingerprint #" + String(id) + " enrolled successfully!");
     flashGreen(3);
 
-    // Notify backend
+    // Notify backend specifically for the link
     if (wifiConnected) {
       HTTPClient http;
       http.begin(String(API_BASE_URL) + String(API_FP_REGISTER_ENDPOINT));
       http.addHeader("Authorization", "Bearer " + String(DEVICE_TOKEN));
       http.addHeader("Content-Type", "application/json");
+      
+      // Link the student ID if we have it from the Live flow
       String body = "{\"device_id\":\"" + String(DEVICE_ID) +
-                    "\",\"fp_id\":" + String(id) + "}";
+                    "\",\"fp_id\":" + String(id);
+      if (currentEnrollStudentId != "") {
+        body += ",\"student_id\":\"" + currentEnrollStudentId + "\"";
+      }
+      body += "}";
+      
       http.POST(body);
       http.end();
     }
   } else {
     oledMsg("STORE FAILED", "Error: " + String(p), "");
+    sendLog("ERROR_STORE", "Failed to store model. Error code: " + String(p));
     flashRed(2);
   }
 
   delay(2000);
+  currentEnrollStudentId = "";
   currentMode = MODE_IDLE;
   showIdleScreen();
 }
@@ -648,13 +672,43 @@ bool sendAttendance(uint8_t fpId, String timestamp, String status) {
 void sendHeartbeat() {
   if (!wifiConnected) return;
   HTTPClient http;
-  http.begin(String(API_BASE_URL) + String(API_DEVICE_HEARTBEAT));
+  http.begin(String(API_BASE_URL) + "/device/heartbeat"); // Standardized path
   http.addHeader("Authorization", "Bearer " + String(DEVICE_TOKEN));
   http.addHeader("Content-Type", "application/json");
 
   String body = "{\"device_id\":\"" + String(DEVICE_ID) + "\",";
   body += "\"session_active\":" + String(sessionActive ? "true" : "false") + ",";
   body += "\"offline_queue\":" + String(offlineCount) + "}";
+
+  int code = http.POST(body);
+  if (code == 200) {
+    String payload = http.getString();
+    StaticJsonDocument<256> doc;
+    deserializeJson(doc, payload);
+    
+    if (doc.containsKey("command")) {
+      String cmd = doc["command"].as<String>();
+      if (cmd == "ENROLL") {
+        currentEnrollStudentId = doc["student_id"].as<String>();
+        currentMode = MODE_ENROLL;
+        Serial.println("[CMD] Remote start enrollment for " + currentEnrollStudentId);
+      }
+    }
+  }
+  http.end();
+}
+
+void sendLog(String status, String message) {
+  if (!wifiConnected) return;
+  HTTPClient http;
+  http.begin(String(API_BASE_URL) + "/device/log");
+  http.addHeader("Authorization", "Bearer " + String(DEVICE_TOKEN));
+  http.addHeader("Content-Type", "application/json");
+
+  String body = "{\"device_id\":\"" + String(DEVICE_ID) + "\",";
+  body += "\"status\":\"" + status + "\",";
+  body += "\"message\":\"" + message + "\",";
+  body += "\"student_id\":\"" + currentEnrollStudentId + "\"}";
 
   http.POST(body);
   http.end();
