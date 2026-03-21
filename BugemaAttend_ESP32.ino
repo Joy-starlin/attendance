@@ -71,7 +71,7 @@ const char* DEFAULT_WIFI_SSID     = "BU-Campus-WiFi";
 const char* DEFAULT_WIFI_PASSWORD = "yourpassword";
 
 // Backend API (your Node.js server URL)
-const char* API_BASE_URL          = "https://api.bugema.ac.ug/v1";
+const char* API_BASE_URL          = "https://attendance.onrender.com/v1"; // Change this to your Render URL after hosting
 const char* API_ATTENDANCE_ENDPOINT = "/attendance";
 const char* API_FP_REGISTER_ENDPOINT = "/fingerprint/register";
 const char* API_DEVICE_HEARTBEAT  = "/device/heartbeat";
@@ -124,6 +124,7 @@ bool configMode        = false;
 String currentSessionId = "";
 String currentCourseId  = "";
 String currentEnrollStudentId = ""; // Student currently being enrolled via Live flow
+String currentEnrollName      = ""; // Name of student being enrolled
 
 // Offline queue (when WiFi is down, store locally)
 struct AttendRecord {
@@ -522,8 +523,8 @@ uint8_t getFingerprintID() {
 //  ENROLL LOOP (Register new fingerprint)
 // ============================================================
 void enrollLoop() {
-  oledMsg("ENROLL MODE", "Waiting for finger", currentEnrollStudentId);
-  sendLog("START", "Entering enrollment mode for " + currentEnrollStudentId);
+  oledMsg("ENROLLING STUDENT", currentEnrollName, "Ready to start?");
+  sendLog("START", "Entering enrollment mode for " + currentEnrollName);
 
   // Get next available slot
   int id = getNextFreeSlot();
@@ -690,8 +691,9 @@ void sendHeartbeat() {
       String cmd = doc["command"].as<String>();
       if (cmd == "ENROLL") {
         currentEnrollStudentId = doc["student_id"].as<String>();
+        currentEnrollName      = doc["student_name"].as<String>();
         currentMode = MODE_ENROLL;
-        Serial.println("[CMD] Remote start enrollment for " + currentEnrollStudentId);
+        Serial.println("[CMD] Remote start enrollment for " + currentEnrollName + " (" + currentEnrollStudentId + ")");
       }
     }
   }

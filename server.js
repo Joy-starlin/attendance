@@ -164,6 +164,35 @@ async function initDatabase() {
       )
     `);
 
+    // Sessions
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id ${uuidType} PRIMARY KEY,
+        course_id ${uuidType} NOT NULL,
+        lecturer_id ${uuidType} NOT NULL,
+        device_id VARCHAR(100),
+        started_at ${timestampType},
+        ended_at ${timestampType},
+        duration_minutes INT,
+        status VARCHAR(20) DEFAULT 'active'
+      )
+    `);
+
+    // Attendance
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS attendance (
+        id ${uuidType} PRIMARY KEY,
+        session_id ${uuidType} NOT NULL,
+        course_id ${uuidType} NOT NULL,
+        student_id ${uuidType} NOT NULL,
+        status VARCHAR(20) DEFAULT 'present',
+        marked_at ${timestampType},
+        fp_id INT,
+        confidence INT,
+        from_offline INT DEFAULT 0
+      )
+    `);
+
     console.log('✅ Tables initialized');
   } catch (err) {
     console.error('❌ Init failed:', err.message);
@@ -227,21 +256,101 @@ app.get('/api/devices', authMiddleware, async (req, res) => {
 
 // DEVICE COMMANDS (Live Enrollment)
 app.post('/api/devices/:id/enroll', authMiddleware, async (req, res) => {
-  deviceCommands.set(req.params.id, { command: 'ENROLL', student_id: req.body.student_id });
-  res.json({ success: true });
+  const { student_id } = req.body;
+  // Get student name for the OLED display
+  const [students] = await db.execute('SELECT name FROM users WHERE id = ?', [student_id]);
+  const studentName = students.length > 0 ? students[0].name : "Unknown Student";
+  
+  deviceCommands.set(req.params.id, { 
+    command: 'ENROLL', 
+    student_id: student_id,
+    student_name: studentName 
+  });
+  res.json({ success: true, student_name: studentName });
+});
+
+// SESSIONS
+app.post('/api/sessions', authMiddleware, async (req, res) => {
+  const { course_id, device_id, duration_minutes } = req.body;
+  const id = uuidv4();
+  try {
+    await db.execute(
+      'INSERT INTO sessions (id, course_id, lecturer_id, device_id, duration_minutes, status) VALUES (?,?,?,?,?,?)',
+      [id, course_id, req.user.id, device_id, duration_minutes || 60, 'active']
+    );
+    res.status(201).json({ session_id: id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/sessions/:id/stop', authMiddleware, async (req, res) => {
+  try {
+    await db.execute('UPDATE sessions SET status = "completed", ended_at = NOW() WHERE id = ?', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/v1/session/active', async (req, res) => {
+  const { device_id } = req.query;
+  try {
+    const [sessions] = await db.execute(
+      `SELECT s.id as session_id, s.course_id, c.name as course_name 
+       FROM sessions s 
+       JOIN courses c ON s.course_id = c.id 
+       WHERE s.device_id = ? AND s.status = 'active' 
+       ORDER BY s.started_at DESC LIMIT 1`, 
+      [device_id]
+    );
+    if (sessions.length === 0) return res.status(404).json({ error: 'No active session' });
+    res.json(sessions[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/v1/device/heartbeat', async (req, res) => {
-  const { device_id } = req.body;
-  await db.execute("INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'", [device_id]).catch(() => {
-    // Postgres fallback for upsert if needed, but let's keep it simple for now
-  });
+  const { device_id, session_active, offline_queue } = req.body;
+  await db.execute(
+    "INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'", 
+    [device_id]
+  ).catch(() => {});
+  
   const pending = deviceCommands.get(device_id);
   if (pending) {
     deviceCommands.delete(device_id);
-    return res.json({ command: pending.command, student_id: pending.student_id });
+    return res.json({ 
+      command: pending.command, 
+      student_id: pending.student_id,
+      student_name: pending.student_name 
+    });
   }
   res.json({ status: 'ok' });
+});
+
+app.post('/v1/attendance', async (req, res) => {
+  const { device_id, fp_id, session_id, course_id, status, timestamp, confidence } = req.body;
+  try {
+    // Find student_id from fp_id
+    const [fps] = await db.execute('SELECT student_id FROM fingerprints WHERE finger_number = ? AND device_id = ?', [fp_id, device_id]);
+    if (fps.length === 0) return res.status(404).json({ error: 'Fingerprint not linked to any student' });
+    
+    const student_id = fps[0].student_id;
+    const id = uuidv4();
+    await db.execute(
+      'INSERT INTO attendance (id, session_id, course_id, student_id, status, marked_at, fp_id, confidence) VALUES (?,?,?,?,?,?,?,?)',
+      [id, session_id, course_id, student_id, status || 'present', timestamp || new Date(), fp_id, confidence]
+    );
+    res.status(201).json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/v1/fingerprint/register', async (req, res) => {
+  const { device_id, fp_id, student_id } = req.body;
+  const id = uuidv4();
+  try {
+    await db.execute(
+      'INSERT INTO fingerprints (id, student_id, finger_number, device_id) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE student_id = ?',
+      [id, student_id, fp_id, device_id, student_id]
+    );
+    res.status(201).json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/v1/device/log', async (req, res) => {
