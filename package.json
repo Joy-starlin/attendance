@@ -10,7 +10,7 @@
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "build": "npm run frontend:install && npm run frontend:build",
-    "postinstall": "npm run frontend:install"
+    "postinstall": "node -e \"if (!process.env.VERCEL) require('child_process').execSync('npm run frontend:install', { stdio: 'inherit' })\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
