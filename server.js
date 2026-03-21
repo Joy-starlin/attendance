@@ -276,6 +276,29 @@ app.post('/api/courses', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.put('/api/courses/:id', authMiddleware, async (req, res) => {
+  const { code, name, total_classes, pass_criteria } = req.body;
+  try {
+    await db.execute(
+      'UPDATE courses SET code = ?, name = ?, total_classes = ?, pass_criteria = ? WHERE id = ?',
+      [code, name, total_classes, pass_criteria, req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/courses/:id', authMiddleware, async (req, res) => {
+  try {
+    const course_id = req.params.id;
+    // Cleanup related records first
+    await db.execute('DELETE FROM attendance WHERE course_id = ?', [course_id]);
+    await db.execute('DELETE FROM sessions WHERE course_id = ?', [course_id]);
+    await db.execute('DELETE FROM student_courses WHERE course_id = ?', [course_id]);
+    await db.execute('DELETE FROM courses WHERE id = ?', [course_id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // STUDENTS
 app.get('/api/students', authMiddleware, async (req, res) => {
   const [students] = await db.execute("SELECT id, name, email, student_id, year_of_study FROM users WHERE role = 'student'");
@@ -331,6 +354,32 @@ app.post('/api/courses/:id/students/bulk', authMiddleware, async (req, res) => {
     } catch { skipped++; }
   }
   res.json({ added, skipped });
+});
+
+app.delete('/api/courses/:id/students/:student_id', authMiddleware, async (req, res) => {
+  try {
+    await db.execute('DELETE FROM student_courses WHERE course_id = ? AND student_id = ?', [req.params.id, req.params.student_id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/courses/:id/students', authMiddleware, async (req, res) => {
+  const { name, student_id } = req.body;
+  const course_id = req.params.id;
+  try {
+    const id = uuidv4();
+    const hash = bcrypt.hashSync(student_id || 'changeme123', 10);
+    await db.execute(
+      'INSERT INTO users (id, name, student_id, password_hash, role) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE name = ?',
+      [id, name, student_id, hash, 'student', name]
+    );
+    const [usr] = await db.execute('SELECT id FROM users WHERE student_id = ?', [student_id]);
+    await db.execute(
+      'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
+      [usr[0].id, course_id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ATTENDANCE REPORT per COURSE

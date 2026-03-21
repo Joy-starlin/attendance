@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   GraduationCap, Plus, FileDown, Upload, PlayCircle,
-  StopCircle, Fingerprint, ChevronDown, ChevronRight, RefreshCw, X
+  StopCircle, Fingerprint, ChevronDown, ChevronRight, RefreshCw, X, Edit3, Trash2
 } from "lucide-react";
 
 type Course = {
@@ -81,7 +81,10 @@ export function CoursesPage() {
   const [devices, setDevices] = React.useState<{ id: string; name: string }[]>([]);
   const [showAddCourse, setShowAddCourse] = React.useState(false);
   const [newCourse, setNewCourse] = React.useState({ code: "", name: "", total_classes: "42", pass_criteria: "75" });
+  const [editingCourse, setEditingCourse] = React.useState<Course | null>(null);
   const [csvStatus, setCsvStatus] = React.useState<Record<string, string>>({});
+  const [showAddStudent, setShowAddStudent] = React.useState<string | null>(null);
+  const [manualStudent, setManualStudent] = React.useState({ name: "", student_id: "" });
   const [enrollTarget, setEnrollTarget] = React.useState<{ courseId: string; studentId: string; studentName: string } | null>(null);
   const [selectedDevice, setSelectedDevice] = React.useState("");
 
@@ -115,6 +118,20 @@ export function CoursesPage() {
     load();
   }
 
+  async function updateCourse(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingCourse) return;
+    await apiRequest(`/api/courses/${editingCourse.id}`, { method: "PUT", body: JSON.stringify(editingCourse) });
+    setEditingCourse(null);
+    load();
+  }
+
+  async function deleteCourse(id: string) {
+    if (!confirm("Are you sure you want to delete this course and all its sessions?")) return;
+    await apiRequest(`/api/courses/${id}`, { method: "DELETE" });
+    load();
+  }
+
   async function startSession(courseId: string) {
     const deviceId = selectedDevice || (devices[0]?.id);
     if (!deviceId) return alert("No device selected.");
@@ -143,6 +160,20 @@ export function CoursesPage() {
     };
     reader.readAsText(file);
     e.target.value = "";
+  }
+
+  async function unenrollStudent(courseId: string, studentId: string) {
+    if (!confirm("Remove this student from the course?")) return;
+    await apiRequest(`/api/courses/${courseId}/students/${studentId}`, { method: "DELETE" });
+    loadStudents(courseId);
+  }
+
+  async function enrollSingleStudent(courseId: string) {
+    if (!manualStudent.name || !manualStudent.student_id) return;
+    await apiRequest(`/api/courses/${courseId}/students`, { method: "POST", body: JSON.stringify(manualStudent) });
+    setManualStudent({ name: "", student_id: "" });
+    setShowAddStudent(null);
+    loadStudents(courseId);
   }
 
   async function triggerEnroll(courseId: string, studentId: string, studentName: string) {
@@ -212,7 +243,36 @@ export function CoursesPage() {
         </Card>
       )}
 
-      {/* ENROLL TOAST */}
+      {/* EDIT COURSE FORM */}
+      {editingCourse && (
+        <Card className="border-amber-500/40">
+          <CardHeader><CardTitle className="text-base">Edit Course: {editingCourse.code}</CardTitle></CardHeader>
+          <CardContent>
+            <form className="grid gap-4 sm:grid-cols-4" onSubmit={updateCourse}>
+              <div className="space-y-1 sm:col-span-1">
+                <Label htmlFor="ecode">Code</Label>
+                <Input id="ecode" value={editingCourse.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, code: e.target.value }) : null)} required />
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <Label htmlFor="ecname">Course Name</Label>
+                <Input id="ecname" value={editingCourse.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, name: e.target.value }) : null)} required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="eclasses">Total Classes</Label>
+                <Input id="eclasses" type="number" value={editingCourse.total_classes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, total_classes: +e.target.value }) : null)} />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="epass">Pass % Required</Label>
+                <Input id="epass" type="number" value={editingCourse.pass_criteria} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, pass_criteria: +e.target.value }) : null)} />
+              </div>
+              <div className="flex gap-2 sm:col-span-4">
+                <Button type="submit" size="sm">Update Course</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setEditingCourse(null)}><X className="h-4 w-4" /></Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
       {enrollTarget && (
         <div className="rounded-md border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-sm text-sky-200">
           📡 Enrollment command sent to device for <strong>{enrollTarget.studentName}</strong>. Have them place their finger on the scanner within 30 seconds.
@@ -244,18 +304,24 @@ export function CoursesPage() {
                     </CardDescription>
                   </div>
                 </div>
-                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-2" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   {!session ? (
-                    <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => startSession(course.id)}>
+                    <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={(e: React.MouseEvent) => { e.stopPropagation(); startSession(course.id); }}>
                       <PlayCircle className="h-3 w-3" /> Start Session
                     </Button>
                   ) : (
-                    <Button size="sm" variant="destructive" className="gap-1" onClick={() => stopSession(course.id)}>
+                    <Button size="sm" variant="destructive" className="gap-1" onClick={(e: React.MouseEvent) => { e.stopPropagation(); stopSession(course.id); }}>
                       <StopCircle className="h-3 w-3" /> Stop Session
                     </Button>
                   )}
-                  <Button size="sm" variant="outline" className="gap-1" onClick={() => downloadReport(course)}>
-                    <FileDown className="h-3 w-3" /> PDF Report
+                  <Button size="sm" variant="outline" className="gap-1" onClick={(e: React.MouseEvent) => { e.stopPropagation(); downloadReport(course); }}>
+                    <FileDown className="h-3 w-3" /> Report
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={(e: React.MouseEvent) => { e.stopPropagation(); setEditingCourse(course); }}>
+                    <Edit3 className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-400 hover:text-rose-300" onClick={(e: React.MouseEvent) => { e.stopPropagation(); deleteCourse(course.id); }}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -263,15 +329,37 @@ export function CoursesPage() {
 
             {isOpen && (
               <CardContent className="border-t border-border/40 pt-4 space-y-4">
-                {/* CSV Upload */}
+                {/* Add Student / CSV Upload Row */}
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs font-medium hover:bg-secondary/60 transition-colors">
+                  <Button size="sm" variant="outline" onClick={() => setShowAddStudent(prev => prev === course.id ? null : course.id)} className="gap-2">
+                    <Plus className="h-3.5 w-3.5" /> Manual Student
+                  </Button>
+                  <Separator orientation="vertical" className="h-4" />
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs font-medium hover:bg-secondary/60 transition-all duration-200">
                     <Upload className="h-3.5 w-3.5" />
-                    Import CSV (Name,RegNo)
-                    <input type="file" accept=".csv,.txt" className="hidden" onChange={e => handleCSVUpload(course.id, e)} />
+                    Batch Upload (CSV)
+                    <input type="file" accept=".csv,.txt" className="hidden" onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleCSVUpload(course.id, e)} />
                   </label>
-                  {csvStatus[course.id] && <span className="text-xs text-muted-foreground">{csvStatus[course.id]}</span>}
+                  {csvStatus[course.id] && <span className="text-xs text-muted-foreground animate-in fade-in slide-in-from-left-2">{csvStatus[course.id]}</span>}
                 </div>
+
+                {/* Manual Add Form */}
+                {showAddStudent === course.id && (
+                  <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border/60 bg-secondary/20 p-3 animate-in fade-in slide-in-from-top-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="sname" className="text-[10px] uppercase tracking-wider text-muted-foreground">Student Name</Label>
+                      <Input id="sname" className="h-8 w-48 text-xs" placeholder="Full Name" value={manualStudent.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualStudent(v => ({ ...v, name: e.target.value }))} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="sreg" className="text-[10px] uppercase tracking-wider text-muted-foreground">Registration No.</Label>
+                      <Input id="sreg" className="h-8 w-40 text-xs font-mono" placeholder="24/BSE/BU/R/..." value={manualStudent.student_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualStudent(v => ({ ...v, student_id: e.target.value }))} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="h-8" onClick={() => enrollSingleStudent(course.id)}>Add Student</Button>
+                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setShowAddStudent(null)}><X className="h-3 w-3" /></Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Students Table */}
                 <div className="overflow-hidden rounded-lg border border-border/60">
@@ -305,9 +393,12 @@ export function CoursesPage() {
                                 ? <span className="text-emerald-400 text-xs">✓ Registered</span>
                                 : <span className="text-rose-400 text-xs">Not registered</span>}
                             </td>
-                            <td className="px-3 py-2 text-center">
+                            <td className="px-3 py-2 text-center flex items-center justify-center gap-2">
                               <Button size="sm" variant="ghost" className="h-7 gap-1 text-xs" onClick={() => triggerEnroll(course.id, s.id, s.name)}>
                                 <Fingerprint className="h-3 w-3" /> Enroll
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-rose-400" onClick={() => unenrollStudent(course.id, s.id)}>
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             </td>
                           </tr>
