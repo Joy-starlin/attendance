@@ -29,7 +29,7 @@ app.use(express.static(FRONTEND_DIST));
 app.use(express.static(__dirname));
 
 // DATABASE SELECTION
-const isPostgres = !!process.env.DATABASE_URL || process.env.DB_TYPE === 'postgres';
+const isPostgres = process.env.DB_TYPE === 'postgres' || (process.env.DATABASE_URL && (process.env.DATABASE_URL.startsWith('postgres') || process.env.DATABASE_URL.startsWith('postgresql')));
 let pool;
 
 if (isPostgres) {
@@ -204,7 +204,7 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const id = uuidv4();
     const hash = bcrypt.hashSync(password, 10);
-    await db.execute('INSERT INTO users (id, name, email, password_hash, role, student_id, year_of_study) VALUES (?,?,?,?,?,?,?)', 
+    await db.execute('INSERT INTO users (id, name, email, password_hash, role, student_id, year_of_study) VALUES (?,?,?,?,?,?,?)',
       [id, name, email, hash, role, student_id || null, year_of_study || null]);
     res.status(201).json({ token: signToken({ id, name, role }), user: { id, name, role } });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -234,7 +234,7 @@ app.post('/api/devices/:id/enroll', authMiddleware, async (req, res) => {
 app.post('/v1/device/heartbeat', async (req, res) => {
   const { device_id } = req.body;
   await db.execute("INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'", [device_id]).catch(() => {
-     // Postgres fallback for upsert if needed, but let's keep it simple for now
+    // Postgres fallback for upsert if needed, but let's keep it simple for now
   });
   const pending = deviceCommands.get(device_id);
   if (pending) {
