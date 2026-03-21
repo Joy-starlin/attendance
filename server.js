@@ -193,6 +193,16 @@ async function initDatabase() {
       )
     `);
 
+    // Student-Course enrollment linking table
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS student_courses (
+        student_id ${uuidType} NOT NULL,
+        course_id ${uuidType} NOT NULL,
+        enrolled_at ${timestampType},
+        PRIMARY KEY (student_id, course_id)
+      )
+    `);
+
     console.log('✅ Tables initialized');
   } catch (err) {
     console.error('❌ Init failed:', err.message);
@@ -229,16 +239,44 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 app.post('/api/auth/register', async (req, res) => {
-  const { name, email, password, role, student_id, year_of_study } = req.body;
+  const { name, email, password, role } = req.body;
+  // Only lecturers and admins can self-register. Students are added by lecturers.
+  const allowedRoles = ['lecturer', 'admin'];
+  if (!allowedRoles.includes(role)) {
+    return res.status(403).json({ error: 'Students cannot self-register. Ask your lecturer to add you.' });
+  }
   try {
     const id = uuidv4();
     const hash = bcrypt.hashSync(password, 10);
-    await db.execute('INSERT INTO users (id, name, email, password_hash, role, student_id, year_of_study) VALUES (?,?,?,?,?,?,?)',
-      [id, name, email, hash, role, student_id || null, year_of_study || null]);
+    await db.execute('INSERT INTO users (id, name, email, password_hash, role) VALUES (?,?,?,?,?)',
+      [id, name, email, hash, role]);
     res.status(201).json({ token: signToken({ id, name, role }), user: { id, name, role } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// COURSES
+app.get('/api/courses', authMiddleware, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT c.*, u.name as lecturer_name FROM courses c LEFT JOIN users u ON c.lecturer_id = u.id ORDER BY c.created_at DESC`
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/courses', authMiddleware, async (req, res) => {
+  const { code, name, total_classes, pass_criteria } = req.body;
+  const id = uuidv4();
+  try {
+    await db.execute(
+      'INSERT INTO courses (id, code, name, lecturer_id, total_classes, pass_criteria) VALUES (?,?,?,?,?,?)',
+      [id, code, name, req.user.id, total_classes || 42, pass_criteria || 75]
+    );
+    res.status(201).json({ id, code, name });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// STUDENTS
 app.get('/api/students', authMiddleware, async (req, res) => {
   const [students] = await db.execute("SELECT id, name, email, student_id, year_of_study FROM users WHERE role = 'student'");
   res.json(students);
@@ -249,10 +287,89 @@ app.get('/api/students/:id', authMiddleware, async (req, res) => {
   res.json(rows[0]);
 });
 
+// STUDENTS per COURSE
+app.get('/api/courses/:id/students', authMiddleware, async (req, res) => {
+  try {
+    const [students] = await db.execute(
+      `SELECT u.id, u.name, u.student_id,
+        (SELECT COUNT(*) FROM attendance a 
+         JOIN sessions s ON a.session_id = s.id 
+         WHERE a.student_id = u.id AND s.course_id = ?) as classes_attended,
+        (SELECT COUNT(*) FROM sessions WHERE course_id = ? AND status = 'completed') as total_sessions,
+        (SELECT COUNT(*) FROM fingerprints WHERE student_id = u.id) as has_fingerprint
+       FROM users u
+       JOIN student_courses sc ON sc.student_id = u.id
+       WHERE sc.course_id = ? AND u.role = 'student'
+       ORDER BY u.name`,
+      [req.params.id, req.params.id, req.params.id]
+    );
+    res.json(students);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// BULK CSV IMPORT
+app.post('/api/courses/:id/students/bulk', authMiddleware, async (req, res) => {
+  const { students } = req.body; // [{ name, student_id }]
+  const course_id = req.params.id;
+  let added = 0, skipped = 0;
+  for (const s of students) {
+    try {
+      const id = uuidv4();
+      const hash = bcrypt.hashSync(s.student_id || 'changeme123', 10); // temp password = reg no
+      await db.execute(
+        'INSERT INTO users (id, name, student_id, password_hash, role) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE name = ?',
+        [id, s.name, s.student_id, hash, 'student', s.name]
+      );
+      const [usr] = await db.execute('SELECT id FROM users WHERE student_id = ?', [s.student_id]);
+      if (usr.length > 0) {
+        await db.execute(
+          'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
+          [usr[0].id, course_id]
+        );
+        added++;
+      }
+    } catch { skipped++; }
+  }
+  res.json({ added, skipped });
+});
+
+// ATTENDANCE REPORT per COURSE
+app.get('/api/courses/:id/report', authMiddleware, async (req, res) => {
+  try {
+    const [course] = await db.execute('SELECT * FROM courses WHERE id = ?', [req.params.id]);
+    const [students] = await db.execute(
+      `SELECT u.name, u.student_id,
+        COUNT(DISTINCT a.session_id) as attended,
+        (SELECT COUNT(*) FROM sessions WHERE course_id = ? AND status = 'completed') as total
+       FROM users u
+       JOIN student_courses sc ON sc.student_id = u.id
+       LEFT JOIN attendance a ON a.student_id = u.id AND a.course_id = ?
+       WHERE sc.course_id = ? AND u.role = 'student'
+       GROUP BY u.id, u.name, u.student_id
+       ORDER BY u.name`,
+      [req.params.id, req.params.id, req.params.id]
+    );
+    const passCriteria = course[0]?.pass_criteria || 75;
+    const report = students.map(s => ({
+      ...s,
+      percentage: s.total > 0 ? Math.round((s.attended / s.total) * 100) : 0,
+      passed: s.total > 0 && (s.attended / s.total * 100) >= passCriteria
+    }));
+    res.json({ course: course[0], students: report });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// STUDENT FINGERPRINT lookup
+app.get('/api/students/:id/fingerprints', authMiddleware, async (req, res) => {
+  const [fps] = await db.execute('SELECT * FROM fingerprints WHERE student_id = ?', [req.params.id]);
+  res.json(fps);
+});
+
 app.get('/api/devices', authMiddleware, async (req, res) => {
   const [devices] = await db.execute('SELECT * FROM devices');
   res.json(devices);
 });
+
 
 // DEVICE COMMANDS (Live Enrollment)
 app.post('/api/devices/:id/enroll', authMiddleware, async (req, res) => {

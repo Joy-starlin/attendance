@@ -50,7 +50,7 @@ export function RegisterPage() {
             Create operator account
           </h1>
           <p className="mt-1 text-sm text-slate-300">
-            Provision a dashboard account for Bugema staff.
+            Provision a staff account. Students are added via Courses → Import CSV.
           </p>
         </div>
         <Card className="gradient-border-card">
@@ -97,20 +97,20 @@ export function RegisterPage() {
               <div className="space-y-2">
                 <Label>Role</Label>
                 <div className="grid grid-cols-3 gap-2 text-xs">
-                  {(["admin", "lecturer", "student"] as UserRole[]).map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setRole(r)}
-                      className={`rounded-md border px-2 py-1 capitalize transition-colors ${
-                        role === r
-                          ? "border-sky-500 bg-sky-500/10 text-sky-100"
-                          : "border-border/70 bg-secondary/40 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                      }`}
-                    >
-                      {r}
-                    </button>
-                  ))}
+                {(["lecturer", "admin"] as UserRole[]).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`rounded-md border px-2 py-1 capitalize transition-colors ${
+                      role === r
+                        ? "border-sky-500 bg-sky-500/10 text-sky-100"
+                        : "border-border/70 bg-secondary/40 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
                 </div>
               </div>
               {error && (

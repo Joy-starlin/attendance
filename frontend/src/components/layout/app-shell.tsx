@@ -16,11 +16,10 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/courses", label: "Courses", icon: GraduationCap },
-  { to: "/students", label: "Students", icon: Users },
-  { to: "/devices", label: "Devices", icon: Cpu },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/", label: "Overview", icon: LayoutDashboard, end: true, roles: ["admin", "lecturer"] },
+  { to: "/courses", label: "Courses", icon: GraduationCap, roles: ["admin", "lecturer"] },
+  { to: "/devices", label: "Devices", icon: Cpu, roles: ["admin", "lecturer"] },
+  { to: "/settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ] as const;
 
 function AppTopBar() {
@@ -64,6 +63,7 @@ function AppTopBar() {
 }
 
 function SideNav() {
+  const { user } = useAuth();
   return (
     <div className="hidden border-r border-border/60 bg-background/30 backdrop-blur lg:block">
       <div className="flex h-full w-64 flex-col px-3 py-4">
@@ -71,7 +71,7 @@ function SideNav() {
           Navigation
         </div>
         <nav className="space-y-1">
-          {navItems.map((item) => (
+          {navItems.filter(item => item.roles.includes(user?.role as never)).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
