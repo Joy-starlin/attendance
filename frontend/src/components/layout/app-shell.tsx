@@ -78,9 +78,9 @@ function SideNav() {
               end={(item as any).end}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground",
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-secondary/60 hover:text-foreground",
                   isActive &&
-                    "bg-secondary/70 text-foreground ring-1 ring-border/60"
+                    "nav-link-active text-foreground"
                 )
               }
             >

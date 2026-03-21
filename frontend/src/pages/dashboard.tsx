@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatRole } from "@/lib/format";
 import { GraduationCap, Users, Cpu, PlayCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -100,7 +101,7 @@ export function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
-        <Card className="gradient-border-card">
+        <Card className="gradient-border-card transition-all duration-300 hover:shadow-sky-500/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle>Quick actions</CardTitle>

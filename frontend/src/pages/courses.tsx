@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -227,7 +228,10 @@ export function CoursesPage() {
         const courseStudents = students[course.id] || [];
 
         return (
-          <Card key={course.id} className={session ? "border-emerald-500/50" : ""}>
+          <Card key={course.id} className={cn(
+            "gradient-border-card transition-all duration-500",
+            session ? "active-session-pulse border-emerald-500/50" : ""
+          )}>
             <CardHeader className="cursor-pointer" onClick={() => toggleExpand(course.id)}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

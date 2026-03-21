@@ -6,10 +6,9 @@ import { LoginPage } from "@/pages/login";
 import { RegisterPage } from "@/pages/register";
 import { DashboardPage } from "@/pages/dashboard";
 import { CoursesPage } from "@/pages/courses";
-import { StudentsPage } from "@/pages/students";
-import { StudentDetailPage } from "@/pages/student-detail";
 import { DevicesPage } from "@/pages/devices";
 import { SettingsPage } from "@/pages/settings";
+import { cn } from "@/lib/utils";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -55,8 +54,6 @@ export default function App() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="courses" element={<CoursesPage />} />
-          <Route path="students" element={<StudentsPage />} />
-          <Route path="students/:id" element={<StudentDetailPage />} />
           <Route path="devices" element={<DevicesPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
