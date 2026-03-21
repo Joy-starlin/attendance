@@ -2,15 +2,14 @@
   "name": "bugema-attendance-api",
   "version": "2.0.0",
   "description": "Bugema University Biometric Attendance System API",
-  "main": "BugemaAttend_Backend_server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node mysql-server.js",
-    "dev": "nodemon mysql-server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "frontend:install": "cd frontend && npm install",
-    "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "build": "npm run frontend:install && npm run frontend:build",
-    "postinstall": "node -e \"if (!process.env.VERCEL) require('child_process').execSync('npm run frontend:install', { stdio: 'inherit' })\""
+    "postinstall": "npm run frontend:install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

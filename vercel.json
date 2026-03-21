@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "framework": null,
-  "installCommand": "npm install",
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "name": "bugema-attendance-frontend",
+  "framework": "vite",
+  "installCommand": "npm run frontend:install",
+  "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
-      "source": "/((?!.*\\.).*)",
-      "destination": "/index.html"
-    }
+      "source": "/(api|v1|ws|enrollment)(.*)",
+      "destination": "https://bugema-attendance.onrender.com/$1$2"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
-
