@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "frontend:install": "cd frontend && npm install --include=dev",
     "frontend:build": "cd frontend && npm run build",
-    "build": "npm run frontend:install && npm run frontend:build",
+    "build": "npm install && npm run frontend:install && npm run frontend:build",
     "postinstall": "npm run frontend:install"
   },
   "dependencies": {
