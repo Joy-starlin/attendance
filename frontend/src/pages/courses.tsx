@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   GraduationCap, Plus, FileDown, Upload, PlayCircle,
-  StopCircle, Fingerprint, ChevronDown, ChevronRight, RefreshCw, X, Edit3, Trash2
+  StopCircle, Fingerprint, ChevronDown, ChevronRight, RefreshCw, X, Edit3, Trash2, MoreHorizontal
 } from "lucide-react";
 
 type Course = {
@@ -21,7 +21,6 @@ type Student = {
 };
 type Session = { session_id: string } | null;
 
-// ── helpers ──────────────────────────────────────────────────────────────────
 async function apiRequest(path: string, init?: RequestInit) {
   const token = localStorage.getItem("token");
   const res = await fetch(path, {
@@ -34,7 +33,6 @@ async function apiRequest(path: string, init?: RequestInit) {
 
 function parseCSV(text: string): { name: string; student_id: string }[] {
   const lines = text.trim().split(/\r?\n/);
-  // skip header line
   return lines.slice(1).map(l => {
     const [name, student_id] = l.split(",").map(s => s.trim());
     return { name, student_id };
@@ -55,22 +53,10 @@ function generatePDF(course: Course, students: Student[]) {
       <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:center;color:${passed ? '#16a34a' : '#dc2626'};font-weight:600">${passed ? "PASS" : "FAIL"}</td>
     </tr>`;
   }).join("");
-
-  win.document.write(`<!DOCTYPE html><html><head><title>Attendance Report — ${course.name}</title>
-  <style>body{font-family:Arial,sans-serif;padding:30px;color:#111}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:16px}th{background:#1e3a5f;color:#fff;padding:8px 10px;text-align:left}@media print{button{display:none}}</style>
-  </head><body>
-  <h1>Bugema University — Attendance Report</h1>
-  <p><strong>Course:</strong> ${course.code} — ${course.name}</p>
-  <p><strong>Pass Criteria:</strong> ${course.pass_criteria ?? 75}% attendance required</p>
-  <button onclick="window.print()" style="margin:12px 0;padding:8px 18px;background:#1e3a5f;color:#fff;border:none;border-radius:4px;cursor:pointer">🖨 Print / Save as PDF</button>
-  <table><thead><tr><th>#</th><th>Student Name</th><th>Reg. No.</th><th>Attended</th><th>%</th><th>Status</th></tr></thead>
-  <tbody>${rows}</tbody></table>
-  <p style="margin-top:24px;font-size:12px;color:#6b7280">Generated on ${new Date().toLocaleString()}</p>
-  </body></html>`);
+  win.document.write(`<html><head><title>Report — ${course.name}</title></head><body><h1>Bugema Attendance Report</h1><p>Course: ${course.code} - ${course.name}</p><table><thead><tr><th>#</th><th>Name</th><th>Reg No.</th><th>Attended</th><th>%</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
   win.document.close();
 }
 
-// ── main component ────────────────────────────────────────────────────────────
 export function CoursesPage() {
   const { user } = useAuth();
   const [courses, setCourses] = React.useState<Course[]>([]);
@@ -127,7 +113,7 @@ export function CoursesPage() {
   }
 
   async function deleteCourse(id: string) {
-    if (!confirm("Are you sure you want to delete this course and all its sessions?")) return;
+    if (!confirm("Are you sure?")) return;
     await apiRequest(`/api/courses/${id}`, { method: "DELETE" });
     load();
   }
@@ -148,22 +134,19 @@ export function CoursesPage() {
   }
 
   function handleCSVUpload(courseId: string, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = async (ev) => {
       const parsed = parseCSV(ev.target?.result as string);
-      if (parsed.length === 0) { setCsvStatus(p => ({ ...p, [courseId]: "❌ No valid rows found. Format: Name,RegNo" })); return; }
       const r = await apiRequest(`/api/courses/${courseId}/students/bulk`, { method: "POST", body: JSON.stringify({ students: parsed }) });
-      setCsvStatus(p => ({ ...p, [courseId]: `✅ Added ${r.added} students (${r.skipped} skipped)` }));
+      setCsvStatus(p => ({ ...p, [courseId]: `✅ Added ${r.added} students` }));
       loadStudents(courseId);
     };
     reader.readAsText(file);
-    e.target.value = "";
   }
 
   async function unenrollStudent(courseId: string, studentId: string) {
-    if (!confirm("Remove this student from the course?")) return;
+    if (!confirm("Remove student?")) return;
     await apiRequest(`/api/courses/${courseId}/students/${studentId}`, { method: "DELETE" });
     loadStudents(courseId);
   }
@@ -178,247 +161,192 @@ export function CoursesPage() {
 
   async function triggerEnroll(courseId: string, studentId: string, studentName: string) {
     const deviceId = selectedDevice || devices[0]?.id;
-    if (!deviceId) return alert("Select a device first.");
+    if (!deviceId) return alert("No device selected.");
     await apiRequest(`/api/devices/${deviceId}/enroll`, { method: "POST", body: JSON.stringify({ student_id: studentId }) });
     setEnrollTarget({ courseId, studentId, studentName });
     setTimeout(() => setEnrollTarget(null), 8000);
   }
 
-  async function downloadReport(course: Course) {
-    const r = await apiRequest(`/api/courses/${course.id}/report`);
-    generatePDF(course, r.students);
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">My Courses</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Manage your course units, students, and attendance.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Manage your course units and students.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {devices.length > 1 && (
             <select value={selectedDevice} onChange={e => setSelectedDevice(e.target.value)}
-              className="rounded-md border border-border/60 bg-background/50 px-3 py-1 text-xs">
-              {devices.map(d => <option key={d.id} value={d.id}>{d.id}</option>)}
+              className="rounded-md border border-border/60 bg-background/50 px-3 py-1.5 text-xs h-9 overflow-hidden max-w-[120px]">
+              {devices.map(d => <option key={d.id} value={d.id}>{d.id.slice(-6)}</option>)}
             </select>
           )}
-          <Button size="sm" onClick={() => setShowAddCourse(v => !v)} className="gap-2">
-            <Plus className="h-4 w-4" /> Add Course
+          <Button size="sm" onClick={() => setShowAddCourse(v => !v)} className="h-9 gap-2">
+            <Plus className="h-4 w-4" /> <span className="hidden xs:inline">Add Course</span>
           </Button>
-          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={load} disabled={loading} className="h-9">
             <RefreshCw className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {/* ADD COURSE FORM */}
+      {/* Forms Grid Fix */}
       {showAddCourse && (
         <Card className="border-sky-500/40">
-          <CardHeader><CardTitle className="text-base">New Course Unit</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm">New Course Unit</CardTitle></CardHeader>
           <CardContent>
-            <form className="grid gap-4 sm:grid-cols-4" onSubmit={addCourse}>
+            <form className="grid gap-4 grid-cols-1 sm:grid-cols-4" onSubmit={addCourse}>
               <div className="space-y-1 sm:col-span-1">
-                <Label htmlFor="code">Code</Label>
-                <Input id="code" placeholder="CS101" value={newCourse.code} onChange={e => setNewCourse(p => ({ ...p, code: e.target.value }))} required />
+                <Label htmlFor="code" className="text-xs">Code</Label>
+                <Input id="code" className="h-8 text-xs" placeholder="CS101" value={newCourse.code} onChange={e => setNewCourse(p => ({ ...p, code: e.target.value }))} required />
               </div>
               <div className="space-y-1 sm:col-span-2">
-                <Label htmlFor="cname">Course Name</Label>
-                <Input id="cname" placeholder="Introduction to Programming" value={newCourse.name} onChange={e => setNewCourse(p => ({ ...p, name: e.target.value }))} required />
+                <Label htmlFor="cname" className="text-xs">Course Name</Label>
+                <Input id="cname" className="h-8 text-xs" placeholder="Course Name" value={newCourse.name} onChange={e => setNewCourse(p => ({ ...p, name: e.target.value }))} required />
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="classes">Total Classes</Label>
-                <Input id="classes" type="number" value={newCourse.total_classes} onChange={e => setNewCourse(p => ({ ...p, total_classes: e.target.value }))} />
+              <div className="grid grid-cols-2 gap-2 sm:col-span-1">
+                <div className="space-y-1">
+                  <Label htmlFor="classes" className="text-[10px]">Classes</Label>
+                  <Input id="classes" type="number" className="h-8 text-xs px-2" value={newCourse.total_classes} onChange={e => setNewCourse(p => ({ ...p, total_classes: e.target.value }))} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="pass" className="text-[10px]">Pass %</Label>
+                  <Input id="pass" type="number" className="h-8 text-xs px-2" value={newCourse.pass_criteria} onChange={e => setNewCourse(p => ({ ...p, pass_criteria: e.target.value }))} />
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="pass">Pass % Required</Label>
-                <Input id="pass" type="number" value={newCourse.pass_criteria} onChange={e => setNewCourse(p => ({ ...p, pass_criteria: e.target.value }))} />
-              </div>
-              <div className="flex gap-2 sm:col-span-4">
-                <Button type="submit" size="sm">Save Course</Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => setShowAddCourse(false)}><X className="h-4 w-4" /></Button>
+              <div className="flex gap-2 sm:col-span-4 pt-1">
+                <Button type="submit" size="sm" className="h-8 text-xs px-4">Save Course</Button>
+                <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setShowAddCourse(false)}>Cancel</Button>
               </div>
             </form>
           </CardContent>
         </Card>
       )}
 
-      {/* EDIT COURSE FORM */}
+      {/* Edit Form - Similar Fix */}
       {editingCourse && (
         <Card className="border-amber-500/40">
-          <CardHeader><CardTitle className="text-base">Edit Course: {editingCourse.code}</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm">Edit Course</CardTitle></CardHeader>
           <CardContent>
-            <form className="grid gap-4 sm:grid-cols-4" onSubmit={updateCourse}>
-              <div className="space-y-1 sm:col-span-1">
-                <Label htmlFor="ecode">Code</Label>
-                <Input id="ecode" value={editingCourse.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, code: e.target.value }) : null)} required />
-              </div>
-              <div className="space-y-1 sm:col-span-2">
-                <Label htmlFor="ecname">Course Name</Label>
-                <Input id="ecname" value={editingCourse.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, name: e.target.value }) : null)} required />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="eclasses">Total Classes</Label>
-                <Input id="eclasses" type="number" value={editingCourse.total_classes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, total_classes: +e.target.value }) : null)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="epass">Pass % Required</Label>
-                <Input id="epass" type="number" value={editingCourse.pass_criteria} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCourse(p => p ? ({ ...p, pass_criteria: +e.target.value }) : null)} />
-              </div>
-              <div className="flex gap-2 sm:col-span-4">
-                <Button type="submit" size="sm">Update Course</Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => setEditingCourse(null)}><X className="h-4 w-4" /></Button>
+            <form className="grid gap-4 grid-cols-1 sm:grid-cols-4" onSubmit={updateCourse}>
+               <div className="space-y-1 sm:col-span-1"><Label className="text-xs text-slate-500">Code</Label><Input className="h-8 text-xs" value={editingCourse.code} onChange={e => setEditingCourse({...editingCourse, code: e.target.value})} /></div>
+               <div className="space-y-1 sm:col-span-2"><Label className="text-xs text-slate-500">Name</Label><Input className="h-8 text-xs" value={editingCourse.name} onChange={e => setEditingCourse({...editingCourse, name: e.target.value})} /></div>
+               <div className="grid grid-cols-2 gap-2 sm:col-span-1">
+                 <div className="space-y-1"><Label className="text-[10px] text-slate-500">Total</Label><Input className="h-8 text-xs" type="number" value={editingCourse.total_classes} onChange={e => setEditingCourse({...editingCourse, total_classes: +e.target.value})} /></div>
+                 <div className="space-y-1"><Label className="text-[10px] text-slate-500">Pass%</Label><Input className="h-8 text-xs" type="number" value={editingCourse.pass_criteria} onChange={e => setEditingCourse({...editingCourse, pass_criteria: +e.target.value})} /></div>
+               </div>
+               <div className="flex gap-2 sm:col-span-4 pt-1">
+                <Button type="submit" size="sm" className="h-8 text-xs">Update</Button>
+                <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setEditingCourse(null)}>Cancel</Button>
               </div>
             </form>
           </CardContent>
         </Card>
       )}
-      {enrollTarget && (
-        <div className="flex items-center gap-3 rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-sm text-sky-200 animate-pulse">
-          <RefreshCw className="h-4 w-4 animate-spin text-sky-400" />
-          <span>
-            📡 <strong>Terminal Enrollment</strong>: Scan initiated for <strong>{enrollTarget.studentName}</strong>. 
-            Have the student place their finger on the sensor now.
-          </span>
-        </div>
-      )}
 
-      {/* COURSES LIST */}
-      {loading ? <p className="text-sm text-muted-foreground">Loading courses...</p> : courses.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No courses yet. Add your first course above.</p>
-      ) : courses.map(course => {
-        const isOpen = expanded === course.id;
-        const session = activeSessions[course.id];
-        const courseStudents = students[course.id] || [];
+      {/* Course Cards Responsive */}
+      <div className="grid gap-4">
+        {courses.map(course => {
+          const isOpen = expanded === course.id;
+          const session = activeSessions[course.id];
+          const courseStudents = students[course.id] || [];
 
-        return (
-          <Card key={course.id} className={cn(
-            "gradient-border-card transition-all duration-500",
-            session ? "active-session-pulse border-emerald-500/50" : ""
-          )}>
-            <CardHeader className="cursor-pointer" onClick={() => toggleExpand(course.id)}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {isOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                  <div>
-                    <CardTitle className="text-base">{course.code} — {course.name}</CardTitle>
-                    <CardDescription>
-                      {course.total_classes ?? 42} classes · {course.pass_criteria ?? 75}% required
-                      {session && <span className="ml-3 text-emerald-400 font-medium">● Session Active</span>}
-                    </CardDescription>
+          return (
+            <Card key={course.id} className={cn("gradient-border-card", session ? "active-session-pulse border-emerald-500/40" : "")}>
+              <div className="p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 cursor-pointer" onClick={() => toggleExpand(course.id)}>
+                    {isOpen ? <ChevronDown className="h-5 w-5 text-sky-400" /> : <ChevronRight className="h-5 w-5 text-slate-500" />}
+                    <div>
+                      <h3 className="font-semibold text-slate-100">{course.code}</h3>
+                      <p className="text-xs text-slate-400">{course.name}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {!session ? (
+                      <Button size="sm" className="h-8 px-3 bg-emerald-600 hover:bg-emerald-500 text-[11px]" onClick={() => startSession(course.id)}>
+                        <PlayCircle className="mr-1.5 h-3.5 w-3.5" /> Start Session
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="destructive" className="h-8 px-3 text-[11px]" onClick={() => stopSession(course.id)}>
+                        <StopCircle className="mr-1.5 h-3.5 w-3.5" /> Stop Session
+                      </Button>
+                    )}
+                    <Button size="sm" variant="outline" className="h-8 px-3 text-[11px]" onClick={() => downloadReport(course)}>
+                      <FileDown className="mr-1.5 h-3.5 w-3.5" /> Report
+                    </Button>
+                    <div className="flex gap-1 ml-1 pl-1 border-l border-border/40">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setEditingCourse(course)}><Edit3 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => deleteCourse(course.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                  {!session ? (
-                    <Button size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={(e: React.MouseEvent) => { e.stopPropagation(); startSession(course.id); }}>
-                      <PlayCircle className="h-3 w-3" /> Start Session
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="destructive" className="gap-1" onClick={(e: React.MouseEvent) => { e.stopPropagation(); stopSession(course.id); }}>
-                      <StopCircle className="h-3 w-3" /> Stop Session
-                    </Button>
-                  )}
-                  <Button size="sm" variant="outline" className="gap-1" onClick={(e: React.MouseEvent) => { e.stopPropagation(); downloadReport(course); }}>
-                    <FileDown className="h-3 w-3" /> Report
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={(e: React.MouseEvent) => { e.stopPropagation(); setEditingCourse(course); }}>
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-400 hover:text-rose-300" onClick={(e: React.MouseEvent) => { e.stopPropagation(); deleteCourse(course.id); }}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
 
-            {isOpen && (
-              <CardContent className="border-t border-border/40 pt-4 space-y-4">
-                {/* Add Student / CSV Upload Row */}
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button size="sm" variant="outline" onClick={() => setShowAddStudent(prev => prev === course.id ? null : course.id)} className="gap-2">
-                    <Plus className="h-3.5 w-3.5" /> Manual Student
-                  </Button>
-                  <Separator orientation="vertical" className="h-4" />
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border/60 bg-secondary/40 px-3 py-1.5 text-xs font-medium hover:bg-secondary/60 transition-all duration-200">
-                    <Upload className="h-3.5 w-3.5" />
-                    Batch Upload (CSV)
-                    <input type="file" accept=".csv,.txt" className="hidden" onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleCSVUpload(course.id, e)} />
-                  </label>
-                  {csvStatus[course.id] && <span className="text-xs text-muted-foreground animate-in fade-in slide-in-from-left-2">{csvStatus[course.id]}</span>}
-                </div>
+                {isOpen && (
+                  <div className="mt-5 space-y-5 border-t border-border/40 pt-5 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <Button size="sm" variant="secondary" className="h-8 text-xs w-full sm:w-auto" onClick={() => setShowAddStudent(showAddStudent === course.id ? null : course.id)}>
+                         <Plus className="mr-2 h-3.5 w-3.5" /> Manual Student
+                      </Button>
+                      <label className="flex h-8 items-center justify-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-4 text-xs font-medium cursor-pointer hover:bg-secondary/40 w-full sm:w-auto">
+                        <Upload className="h-3.5 w-3.5" /> Batch Import (CSV)
+                        <input type="file" accept=".csv" className="hidden" onChange={(e) => handleCSVUpload(course.id, e)} />
+                      </label>
+                      {csvStatus[course.id] && <span className="text-[10px] text-sky-400 italic">{csvStatus[course.id]}</span>}
+                    </div>
 
-                {/* Manual Add Form */}
-                {showAddStudent === course.id && (
-                  <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border/60 bg-secondary/20 p-3 animate-in fade-in slide-in-from-top-2">
-                    <div className="space-y-1">
-                      <Label htmlFor="sname" className="text-[10px] uppercase tracking-wider text-muted-foreground">Student Name</Label>
-                      <Input id="sname" className="h-8 w-48 text-xs" placeholder="Full Name" value={manualStudent.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualStudent(v => ({ ...v, name: e.target.value }))} />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="sreg" className="text-[10px] uppercase tracking-wider text-muted-foreground">Registration No.</Label>
-                      <Input id="sreg" className="h-8 w-40 text-xs font-mono" placeholder="24/BSE/BU/R/..." value={manualStudent.student_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualStudent(v => ({ ...v, student_id: e.target.value }))} />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" className="h-8" onClick={() => enrollSingleStudent(course.id)}>Add Student</Button>
-                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setShowAddStudent(null)}><X className="h-3 w-3" /></Button>
+                    {showAddStudent === course.id && (
+                      <div className="flex flex-col sm:flex-row sm:items-end gap-3 rounded-lg bg-slate-900/40 p-3 border border-slate-800">
+                        <div className="w-full sm:flex-1"><Label className="text-[10px] text-slate-500">Full Name</Label><Input className="h-8 text-xs" value={manualStudent.name} onChange={e => setManualStudent({...manualStudent, name:e.target.value})} /></div>
+                        <div className="w-full sm:w-48"><Label className="text-[10px] text-slate-500">Reg No.</Label><Input className="h-8 text-xs font-mono" value={manualStudent.student_id} onChange={e => setManualStudent({...manualStudent, student_id:e.target.value})} /></div>
+                        <div className="flex gap-2 w-full sm:w-auto justify-end">
+                          <Button size="sm" className="h-8" onClick={() => enrollSingleStudent(course.id)}>Add</Button>
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowAddStudent(null)}><X className="h-4 w-4" /></Button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="overflow-x-auto rounded-lg border border-border/60">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-950/50 text-[10px] uppercase text-slate-500 font-bold border-b border-border/60">
+                          <tr>
+                            <th className="px-3 py-2 text-left">Student</th>
+                            <th className="px-3 py-2 text-left">Reg No.</th>
+                            <th className="px-3 py-2 text-center">%</th>
+                            <th className="px-3 py-2 text-center">Fp</th>
+                            <th className="px-3 py-2 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/40">
+                          {courseStudents.map(s => {
+                            const pct = s.total_sessions > 0 ? Math.round((s.classes_attended / s.total_sessions) * 100) : 0;
+                            return (
+                              <tr key={s.id} className="hover:bg-slate-800/30">
+                                <td className="px-3 py-2 whitespace-nowrap"><div className="font-medium text-slate-200">{s.name}</div></td>
+                                <td className="px-3 py-2 font-mono text-xs text-sky-400 whitespace-nowrap">{s.student_id || "-"}</td>
+                                <td className="px-3 py-2 text-center text-xs">{pct}%</td>
+                                <td className="px-3 py-2 text-center">
+                                  <div className={cn("h-2 w-2 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-slate-700")} />
+                                </td>
+                                <td className="px-3 py-2 text-right">
+                                  <div className="flex justify-end gap-1">
+                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-sky-400" onClick={() => triggerEnroll(course.id, s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
+                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-rose-500" onClick={() => unenrollStudent(course.id, s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
-
-                {/* Students Table */}
-                <div className="overflow-hidden rounded-lg border border-border/60">
-                  <table className="min-w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="border-b border-border/60 bg-secondary/40 text-xs uppercase tracking-wide text-muted-foreground">
-                        <th className="px-3 py-2 text-left">Student</th>
-                        <th className="px-3 py-2 text-left">Reg No.</th>
-                        <th className="px-3 py-2 text-center">Attended</th>
-                        <th className="px-3 py-2 text-center">%</th>
-                        <th className="px-3 py-2 text-center">Fingerprint</th>
-                        <th className="px-3 py-2 text-center">Enroll FP</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {courseStudents.length === 0 ? (
-                        <tr><td colSpan={6} className="px-3 py-6 text-center text-xs text-muted-foreground">No students yet. Import a CSV or add manually.</td></tr>
-                      ) : courseStudents.map(s => {
-                        const pct = s.total_sessions > 0 ? Math.round((s.classes_attended / s.total_sessions) * 100) : 0;
-                        const passed = pct >= (course.pass_criteria ?? 75);
-                        return (
-                          <tr key={s.id} className="border-b border-border/40 last:border-0 hover:bg-secondary/40">
-                            <td className="px-3 py-2 font-medium">{s.name}</td>
-                            <td className="px-3 py-2 text-xs text-muted-foreground font-mono">{s.student_id || "—"}</td>
-                            <td className="px-3 py-2 text-center text-xs">{s.classes_attended}/{s.total_sessions}</td>
-                            <td className="px-3 py-2 text-center">
-                              <Badge variant={passed ? "default" : "destructive"} className="text-xs">{pct}%</Badge>
-                            </td>
-                            <td className="px-3 py-2 text-center">
-                              {s.has_fingerprint > 0
-                                ? <span className="text-emerald-400 text-xs">✓ Registered</span>
-                                : <span className="text-rose-400 text-xs">Not registered</span>}
-                            </td>
-                            <td className="px-3 py-2 text-center flex items-center justify-center gap-2">
-                              <Button size="sm" variant="ghost" className="h-7 gap-1 text-xs" onClick={() => triggerEnroll(course.id, s.id, s.name)}>
-                                <Fingerprint className="h-3 w-3" /> Enroll
-                              </Button>
-                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-rose-400" onClick={() => unenrollStudent(course.id, s.id)}>
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  <GraduationCap className="inline h-3 w-3 mr-1" />{courseStudents.length} student{courseStudents.length !== 1 ? "s" : ""} enrolled
-                </p>
-              </CardContent>
-            )}
-          </Card>
-        );
-      })}
+              </div>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }

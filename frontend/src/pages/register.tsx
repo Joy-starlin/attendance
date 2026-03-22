@@ -40,9 +40,9 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(129,140,248,0.22),transparent_55%)]">
-      <div className="mx-auto w-full max-w-md px-4">
-        <div className="mb-8 text-center">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(129,140,248,0.22),transparent_55%)]">
+      <div className="w-full max-w-[400px]">
+        <div className="mb-8 text-center px-2">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950/70 text-sky-400 ring-1 ring-sky-500/40">
             <Fingerprint className="h-6 w-6" />
           </div>

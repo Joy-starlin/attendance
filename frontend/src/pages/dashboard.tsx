@@ -95,10 +95,10 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="bg-sky-500/5 border-sky-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-sky-400">Your Courses</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-sky-400">Courses</CardTitle>
             <GraduationCap className="h-4 w-4 text-sky-400" />
           </CardHeader>
           <CardContent>
@@ -107,7 +107,7 @@ export function DashboardPage() {
         </Card>
         <Card className="bg-emerald-500/5 border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Student Directory</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Students</CardTitle>
             <Users className="h-4 w-4 text-emerald-400" />
           </CardHeader>
           <CardContent>
@@ -116,7 +116,7 @@ export function DashboardPage() {
         </Card>
         <Card className="bg-violet-500/5 border-violet-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-violet-400">Online Terminals</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-violet-400">Terminals</CardTitle>
             <Cpu className="h-4 w-4 text-violet-400" />
           </CardHeader>
           <CardContent>
@@ -125,7 +125,7 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-[1fr_350px]">
         <div className="space-y-6">
           <Card className="gradient-border-card">
             <CardHeader>
@@ -135,11 +135,11 @@ export function DashboardPage() {
               </CardTitle>
               <CardDescription>Start teaching sessions or manage your registered devices.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <Button size="lg" className="h-12 px-6" onClick={() => navigate("/courses")}>
+            <CardContent className="flex flex-col sm:flex-row gap-3">
+              <Button size="lg" className="h-12 px-6 w-full sm:w-auto" onClick={() => navigate("/courses")}>
                 Start Attendance Session
               </Button>
-              <Button variant="secondary" size="lg" className="h-12 px-6" onClick={() => navigate("/students")}>
+              <Button variant="secondary" size="lg" className="h-12 px-6 w-full sm:w-auto" onClick={() => navigate("/students")}>
                 Manage Records
               </Button>
             </CardContent>

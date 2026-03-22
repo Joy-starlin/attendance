@@ -37,45 +37,42 @@ export function AppShell() {
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_45%),radial-gradient(ellipse_at_bottom,rgba(129,140,248,0.10),transparent_55%)]">
       {/* Top Bar */}
       <div className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 sm:px-6 xl:px-8">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-3 sm:px-6">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden h-8 w-8"
               onClick={toggleMenu}
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/25">
-              <Fingerprint className="h-5 w-5" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/25">
+              <Fingerprint className="h-4 w-4" />
             </div>
-            <div>
-              <div className="text-sm font-semibold tracking-tight hidden xs:block">
+            <div className="hidden xs:block">
+              <div className="text-xs font-semibold tracking-tight">
                 Faculty Portal
-              </div>
-              <div className="text-[9px] uppercase tracking-wider text-muted-foreground leading-none hidden xs:block">
-                Bugema University
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden text-right md:block">
               <div className="text-sm font-medium leading-none mb-1">{user?.name}</div>
               <div className="text-[10px] text-muted-foreground">
-                <span className="capitalize">{user?.role ? formatRole(user.role) : ""}</span> &bull; {user?.email}
+                <span className="capitalize">{user?.role ? formatRole(user.role) : ""}</span>
               </div>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="h-8"
+              className="h-8 px-2 sm:px-3 text-xs"
               onClick={() => {
                 logout();
                 navigate("/login", { replace: true });
               }}
             >
-              <LogOut className="mr-2 h-3.5 w-3.5" />
+              <LogOut className="sm:mr-2 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Sign out</span>
             </Button>
           </div>

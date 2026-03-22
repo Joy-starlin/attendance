@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { api, ApiError, Student } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Users, RefreshCw, Search, Upload, Fingerprint, FileDown, Plus, X, Edit3, Trash2 } from "lucide-react";
 
 async function apiRequest(path: string, init?: RequestInit) {
@@ -85,7 +87,7 @@ export function StudentsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete student? This removes all their attendance and fingerprints permanently.")) return;
+    if (!confirm("Delete student?")) return;
     try {
       await apiRequest(`/api/students/${id}`, { method: "DELETE" });
       load();
@@ -94,30 +96,30 @@ export function StudentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-white">Student Management</h1>
-          <p className="mt-1 text-sm text-slate-400">View, edit, and manage registered student profiles.</p>
+          <p className="mt-1 text-sm text-slate-400">View and manage registered student profiles.</p>
         </div>
         <div className="flex items-center gap-2">
-           <Button onClick={() => setShowRegisterModal(true)} className="bg-sky-600 hover:bg-sky-500">
-             <Plus className="mr-2 h-4 w-4" /> New Student
+           <Button onClick={() => setShowRegisterModal(true)} className="bg-sky-600 hover:bg-sky-500 w-full sm:w-auto">
+             <Plus className="mr-2 h-4 w-4" /> <span className="hidden xs:inline">New Student</span>
            </Button>
            <Button variant="outline" onClick={load} disabled={loading} size="icon"><RefreshCw className="h-4 w-4" /></Button>
         </div>
       </div>
 
       <Card className="gradient-border-card bg-slate-900/50">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-           <div className="flex-1 max-w-sm">
+        <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
+           <div className="w-full max-w-sm">
              <div className="relative">
                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-               <Input className="pl-9 h-9 bg-slate-950/50" placeholder="Search by name or reg no..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+               <Input className="pl-9 h-9 bg-slate-950/50 text-xs" placeholder="Search students..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
              </div>
            </div>
-           <div className="flex gap-2 ml-4">
-             <Button variant="secondary" size="sm" onClick={() => generateStudentsPDF(filteredStudents)}><FileDown className="mr-2 h-4 w-4" />Export</Button>
-             <label className="flex items-center gap-2 cursor-pointer bg-slate-950/50 border border-slate-800 rounded-md px-3 py-1 text-xs hover:bg-slate-800 transition-colors">
+           <div className="flex gap-2 w-full md:w-auto">
+             <Button variant="secondary" size="sm" className="flex-1 md:flex-none h-9 text-xs" onClick={() => generateStudentsPDF(filteredStudents)}><FileDown className="mr-2 h-4 w-4" />Export</Button>
+             <label className="flex flex-1 md:flex-none h-9 items-center justify-center gap-2 cursor-pointer bg-slate-950/50 border border-slate-800 rounded-md px-3 text-[11px] hover:bg-slate-800 transition-colors">
                 <Upload className="h-3.5 w-3.5" /> CSV Import
                 <input type="file" accept=".csv" className="hidden" onChange={async (e) => {
                   const file = e.target.files?.[0]; if (!file) return;
@@ -139,38 +141,30 @@ export function StudentsPage() {
              <table className="w-full text-sm">
                <thead className="bg-slate-950/50 text-[10px] uppercase text-slate-500 font-bold border-b border-slate-800">
                  <tr>
-                   <th className="px-4 py-3 text-left">Reg No.</th>
-                   <th className="px-4 py-3 text-left">Name</th>
-                   <th className="px-4 py-3 text-left">Year</th>
-                   <th className="px-4 py-3 text-left">Biometrics</th>
-                   <th className="px-4 py-3 text-right">Actions</th>
+                   <th className="px-3 py-3 text-left">Reg No.</th>
+                   <th className="px-3 py-3 text-left">Name</th>
+                   <th className="px-3 py-3 text-left hidden sm:table-cell">Year</th>
+                   <th className="px-3 py-3 text-left">Biometrics</th>
+                   <th className="px-3 py-3 text-right">Actions</th>
                  </tr>
                </thead>
                <tbody className="divide-y divide-slate-800">
                  {filteredStudents.map(s => (
                    <tr key={s.id} className="hover:bg-slate-800/30 transition-colors">
-                     <td className="px-4 py-3 text-xs font-mono text-sky-400">{s.student_id || "—"}</td>
-                     <td className="px-4 py-3">
-                       <div className="font-medium text-slate-200">{s.name}</div>
-                       <div className="text-[10px] text-slate-500">{s.email}</div>
+                     <td className="px-3 py-3 text-xs font-mono text-sky-400">{s.student_id ? s.student_id.slice(-8) : "-"}</td>
+                     <td className="px-3 py-3">
+                       <div className="font-medium text-slate-200 text-xs sm:text-sm">{s.name}</div>
+                       <div className="text-[9px] text-slate-500 hidden xs:block">{s.email}</div>
                      </td>
-                     <td className="px-4 py-3 text-xs">Year {s.year_of_study || 1}</td>
-                     <td className="px-4 py-3">
-                       <Badge variant={s.has_fingerprint ? "default" : "outline"} className={s.has_fingerprint ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "text-slate-500"}>
-                         {s.has_fingerprint ? "Registered" : "Pending"}
-                       </Badge>
+                     <td className="px-3 py-3 text-xs hidden sm:table-cell">Yr {s.year_of_study || 1}</td>
+                     <td className="px-3 py-3">
+                       <div className={cn("h-1.5 w-1.5 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-slate-700")} />
                      </td>
-                     <td className="px-4 py-3 text-right">
+                     <td className="px-3 py-3 text-right">
                        <div className="flex justify-end gap-1">
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-sky-400" title="Enroll Fingerprint" onClick={() => handleLiveEnroll(s.id, s.name)}>
-                           <Fingerprint className="h-4 w-4" />
-                         </Button>
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" title="Edit Profile" onClick={() => setEditingStudent(s)}>
-                           <Edit3 className="h-4 w-4" />
-                         </Button>
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" title="Delete Student" onClick={() => handleDelete(s.id)}>
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
+                         <Button size="icon" variant="ghost" className="h-8 w-8 text-sky-400" onClick={() => handleLiveEnroll(s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
+                         <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setEditingStudent(s)}><Edit3 className="h-3.5 w-3.5" /></Button>
+                         <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => handleDelete(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                        </div>
                      </td>
                    </tr>
@@ -181,11 +175,11 @@ export function StudentsPage() {
         </CardContent>
       </Card>
 
-      {/* Register Modal */}
+      {/* Responsive Register Modal */}
       {showRegisterModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md border-slate-700 shadow-2xl">
-            <CardHeader className="border-b border-slate-800"><CardTitle>Register Student</CardTitle></CardHeader>
+          <Card className="w-full max-w-sm border-slate-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <CardHeader className="border-b border-slate-800 bg-slate-900/50"><CardTitle>Register Student</CardTitle></CardHeader>
             <form onSubmit={async (e) => {
               e.preventDefault(); setRegistering(true);
               try {
@@ -194,26 +188,26 @@ export function StudentsPage() {
               } catch (err: any) { alert(err.message); } finally { setRegistering(false); }
             }}>
               <CardContent className="space-y-4 pt-4">
-                <div className="space-y-1"><Label className="text-[10px]">Name</Label><Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} /></div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1"><Label className="text-[10px]">Reg No.</Label><Input required value={formData.student_id} onChange={e => setFormData({...formData, student_id: e.target.value})} /></div>
-                  <div className="space-y-1"><Label className="text-[10px]">Year</Label><Input required type="number" value={formData.year_of_study} onChange={e => setFormData({...formData, year_of_study: parseInt(e.target.value)})} /></div>
+                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Name</Label><Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="h-9" /></div>
+                <div className="grid grid-cols-1 gap-4">
+                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Reg No.</Label><Input required value={formData.student_id} onChange={e => setFormData({...formData, student_id: e.target.value})} className="h-9 font-mono" /></div>
+                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Year of Study</Label><Input required type="number" min="1" max="5" value={formData.year_of_study} onChange={e => setFormData({...formData, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
                 </div>
               </CardContent>
-              <div className="flex justify-end gap-2 p-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
                 <Button variant="ghost" size="sm" onClick={() => setShowRegisterModal(false)}>Cancel</Button>
-                <Button size="sm" type="submit" disabled={registering}>{registering ? "Saving..." : "Save Record"}</Button>
+                <Button size="sm" type="submit" disabled={registering} className="bg-sky-600 px-6">{registering ? "..." : "Save Student"}</Button>
               </div>
             </form>
           </Card>
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* Responsive Edit Modal */}
       {editingStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md border-sky-500/30">
-            <CardHeader className="border-b border-slate-800"><CardTitle>Edit Profile</CardTitle></CardHeader>
+          <Card className="w-full max-w-sm border-sky-500/30 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <CardHeader className="border-b border-slate-800 bg-slate-900/50"><CardTitle>Edit Profile</CardTitle></CardHeader>
             <form onSubmit={async (e) => {
               e.preventDefault();
               try {
@@ -222,16 +216,16 @@ export function StudentsPage() {
               } catch (err: any) { alert(err.message); }
             }}>
               <CardContent className="space-y-4 pt-4">
-                <div className="space-y-1"><Label className="text-[10px]">Name</Label><Input value={editingStudent.name} onChange={e => setEditingStudent({...editingStudent, name: e.target.value})} /></div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1"><Label className="text-[10px]">Reg No.</Label><Input value={editingStudent.student_id} onChange={e => setEditingStudent({...editingStudent, student_id: e.target.value})} /></div>
-                  <div className="space-y-1"><Label className="text-[10px]">Year</Label><Input type="number" value={editingStudent.year_of_study} onChange={e => setEditingStudent({...editingStudent, year_of_study: parseInt(e.target.value)})} /></div>
+                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Full Name</Label><Input value={editingStudent.name || ""} onChange={e => setEditingStudent({...editingStudent, name: e.target.value})} className="h-9" /></div>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Reg No.</Label><Input value={editingStudent.student_id || ""} onChange={e => setEditingStudent({...editingStudent, student_id: e.target.value})} className="h-9 font-mono" /></div>
+                  <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Year</Label><Input type="number" value={editingStudent.year_of_study || 1} onChange={e => setEditingStudent({...editingStudent, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
                 </div>
-                <div className="space-y-1"><Label className="text-[10px]">Email</Label><Input value={editingStudent.email} onChange={e => setEditingStudent({...editingStudent, email: e.target.value})} /></div>
+                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Email Address</Label><Input type="email" value={editingStudent.email || ""} onChange={e => setEditingStudent({...editingStudent, email: e.target.value})} className="h-9" /></div>
               </CardContent>
-              <div className="flex justify-end gap-2 p-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
                 <Button variant="ghost" size="sm" onClick={() => setEditingStudent(null)}>Cancel</Button>
-                <Button size="sm" type="submit" className="bg-sky-600">Save Changes</Button>
+                <Button size="sm" type="submit" className="bg-sky-600 px-6">Update</Button>
               </div>
             </form>
           </Card>
