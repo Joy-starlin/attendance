@@ -45,16 +45,18 @@ function generateSemesterPDF(data: any[]) {
     th { background: #f8fafc; padding: 12px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
     td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; }
     tr:nth-child(even) { background: #f8fafc; }
-    .actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    button { padding: 10px 16px; font-size: 0.875rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 600; color: white; flex: 1; min-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    button { padding: 6px 12px; font-size: 0.75rem; cursor: pointer; border: none; border-radius: 4px; font-weight: 600; color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     .btn-print { background: #0033a0; }
-    .btn-close { background: #e11d48; }
+    .btn-save { background: #16a34a; }
+    .btn-close { background: #475569; margin-left: auto; }
     @media print { .no-print { display: none !important; } body { padding: 0 !important; } .table-responsive { overflow-x: visible !important; } }
   </style>
   </head><body>
   <div class="actions no-print">
-    <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
-    <button class="btn-close" onclick="window.close()">Close Report</button>
+    <button class="btn-print" onclick="window.print()">Print</button>
+    <button class="btn-save" onclick="window.print()">Save PDF</button>
+    <button class="btn-close" onclick="window.close()">Exit</button>
   </div>
   <h1>Bugema University — Semester Summary</h1>
   <div class="table-responsive">
