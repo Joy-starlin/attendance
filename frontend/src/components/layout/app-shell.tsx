@@ -56,7 +56,7 @@ export function AppShell() {
             </div>
             <div className="hidden xs:block">
               <div className="text-xs font-semibold tracking-tight">
-                Faculty Portal
+                Bugema University
               </div>
             </div>
           </div>

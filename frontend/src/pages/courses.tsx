@@ -286,10 +286,10 @@ export function CoursesPage() {
                   <div className="mt-5 space-y-5 border-t border-border/40 pt-5 animate-in fade-in duration-300">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                       <Button size="sm" variant="secondary" className="h-8 text-xs w-full sm:w-auto" onClick={() => setShowAddStudent(showAddStudent === course.id ? null : course.id)}>
-                         <Plus className="mr-2 h-3.5 w-3.5" /> Manual Student
+                         <Plus className="mr-2 h-3.5 w-3.5" /> Enroll Student
                       </Button>
                       <label className="flex h-8 items-center justify-center gap-2 rounded-md border border-border/60 bg-secondary/20 px-4 text-xs font-medium cursor-pointer hover:bg-secondary/40 w-full sm:w-auto">
-                        <Upload className="h-3.5 w-3.5" /> Batch Import (CSV)
+                        <Upload className="h-3.5 w-3.5" /> Import to Course (CSV)
                         <input type="file" accept=".csv" className="hidden" onChange={(e) => handleCSVUpload(course.id, e)} />
                       </label>
                       {csvStatus[course.id] && <span className="text-[10px] text-primary italic">{csvStatus[course.id]}</span>}

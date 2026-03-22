@@ -47,10 +47,10 @@ export function LoginPage() {
             <Fingerprint className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
-            Faculty Portal
+            Bugema University
           </h1>
           <p className="text-sm text-muted-foreground">
-            Secure login for lecturers and administrators.
+            Faculty & Staff Attendance Portal.
           </p>
         </div>
         <Card className="gradient-border-card">

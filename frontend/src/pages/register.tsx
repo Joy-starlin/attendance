@@ -47,10 +47,10 @@ export function RegisterPage() {
             <Fingerprint className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Faculty Registration
+            Bugema University
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create your staff account to manage courses and biometric attendance.
+            Faculty & Staff Registration Portal.
           </p>
         </div>
         <Card className="gradient-border-card">
