@@ -242,18 +242,18 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 app.post('/api/auth/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, student_id, year_of_study } = req.body;
   const allowedRoles = ['lecturer', 'admin'];
   const finalRole = (role && allowedRoles.includes(role)) ? role : 'lecturer';
   
-  if (!allowedRoles.includes(finalRole)) {
+  if (!allowedRoles.includes(finalRole) && role !== 'student') {
     return res.status(403).json({ error: 'Access denied. Account creation is restricted to Faculty and Staff.' });
   }
   try {
     const id = uuidv4();
     const hash = bcrypt.hashSync(password, 10);
-    await db.execute('INSERT INTO users (id, name, email, password_hash, role) VALUES (?,?,?,?,?)',
-      [id, name, email, hash, role]);
+    await db.execute('INSERT INTO users (id, name, email, password_hash, role, student_id, year_of_study) VALUES (?,?,?,?,?,?,?)',
+      [id, name, email, hash, role, student_id || null, year_of_study || null]);
     res.status(201).json({ token: signToken({ id, name, role }), user: { id, name, role } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -342,20 +342,37 @@ app.post('/api/courses/:id/students/bulk', authMiddleware, async (req, res) => {
   for (const s of students) {
     try {
       const id = uuidv4();
-      const hash = bcrypt.hashSync(s.student_id || 'changeme123', 10); // temp password = reg no
-      await db.execute(
-        'INSERT INTO users (id, name, student_id, password_hash, role) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE name = ?',
-        [id, s.name, s.student_id, hash, 'student', s.name]
-      );
+      const email = s.email || `${s.student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug`;
+      const hash = bcrypt.hashSync(s.student_id || 'changeme123', 10);
+      
+      if (isPostgres) {
+        await db.execute(
+          'INSERT INTO users (id, name, email, student_id, password_hash, role) VALUES (?,?,?,?,?,?) ON CONFLICT (student_id) DO UPDATE SET name = EXCLUDED.name',
+          [id, s.name, email, s.student_id, hash, 'student']
+        );
+      } else {
+        await db.execute(
+          'INSERT INTO users (id, name, email, student_id, password_hash, role) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name)',
+          [id, s.name, email, s.student_id, hash, 'student']
+        );
+      }
+
       const [usr] = await db.execute('SELECT id FROM users WHERE student_id = ?', [s.student_id]);
       if (usr.length > 0) {
-        await db.execute(
-          'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
-          [usr[0].id, course_id]
-        );
+        if (isPostgres) {
+          await db.execute(
+            'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON CONFLICT (student_id, course_id) DO NOTHING',
+            [usr[0].id, course_id]
+          );
+        } else {
+          await db.execute(
+            'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
+            [usr[0].id, course_id]
+          );
+        }
         added++;
       }
-    } catch { skipped++; }
+    } catch (e) { console.error(e); skipped++; }
   }
   res.json({ added, skipped });
 });
@@ -372,16 +389,33 @@ app.post('/api/courses/:id/students', authMiddleware, async (req, res) => {
   const course_id = req.params.id;
   try {
     const id = uuidv4();
+    const email = `${student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug`;
     const hash = bcrypt.hashSync(student_id || 'changeme123', 10);
-    await db.execute(
-      'INSERT INTO users (id, name, student_id, password_hash, role) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE name = ?',
-      [id, name, student_id, hash, 'student', name]
-    );
+    
+    if (isPostgres) {
+      await db.execute(
+        'INSERT INTO users (id, name, email, student_id, password_hash, role) VALUES (?,?,?,?,?,?) ON CONFLICT (student_id) DO UPDATE SET name = EXCLUDED.name',
+        [id, name, email, student_id, hash, 'student']
+      );
+    } else {
+      await db.execute(
+        'INSERT INTO users (id, name, email, student_id, password_hash, role) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name = VALUES(name)',
+        [id, name, email, student_id, hash, 'student']
+      );
+    }
+
     const [usr] = await db.execute('SELECT id FROM users WHERE student_id = ?', [student_id]);
-    await db.execute(
-      'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
-      [usr[0].id, course_id]
-    );
+    if (isPostgres) {
+      await db.execute(
+        'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON CONFLICT (student_id, course_id) DO NOTHING',
+        [usr[0].id, course_id]
+      );
+    } else {
+      await db.execute(
+        'INSERT INTO student_courses (student_id, course_id) VALUES (?,?) ON DUPLICATE KEY UPDATE student_id = student_id',
+        [usr[0].id, course_id]
+      );
+    }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
