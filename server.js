@@ -235,7 +235,7 @@ app.post('/api/auth/login', async (req, res) => {
     const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) return res.status(401).json({ error: 'User not found' });
     const user = users[0];
-    if (user.role === 'student') return res.status(403).json({ error: 'Students do not have web access. Use the biometric terminal for attendance.' });
+    if (user.role === 'student') return res.status(403).json({ error: 'Access denied. This portal is for Faculty and Staff only.' });
     if (!bcrypt.compareSync(password, user.password_hash)) return res.status(401).json({ error: 'Wrong password' });
     res.json({ token: signToken({ id: user.id, name: user.name, role: user.role }), user: { id: user.id, name: user.name, role: user.role } });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -243,10 +243,11 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password, role } = req.body;
-  // Only lecturers and admins can self-register. Students are added by lecturers.
   const allowedRoles = ['lecturer', 'admin'];
-  if (!allowedRoles.includes(role)) {
-    return res.status(403).json({ error: 'Students cannot self-register. Ask your lecturer to add you.' });
+  const finalRole = (role && allowedRoles.includes(role)) ? role : 'lecturer';
+  
+  if (!allowedRoles.includes(finalRole)) {
+    return res.status(403).json({ error: 'Access denied. Account creation is restricted to Faculty and Staff.' });
   }
   try {
     const id = uuidv4();
@@ -505,7 +506,7 @@ app.post('/v1/attendance', async (req, res) => {
   try {
     // Find student_id from fp_id
     const [fps] = await db.execute('SELECT student_id FROM fingerprints WHERE finger_number = ? AND device_id = ?', [fp_id, device_id]);
-    if (fps.length === 0) return res.status(404).json({ error: 'Fingerprint not linked to any student' });
+    if (fps.length === 0) return res.status(404).json({ error: 'Fingerprint not linked to a registered profile' });
     
     const student_id = fps[0].student_id;
     const id = uuidv4();

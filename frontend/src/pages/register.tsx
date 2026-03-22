@@ -50,7 +50,7 @@ export function RegisterPage() {
             Faculty Registration
           </h1>
           <p className="mt-1 text-sm text-slate-300">
-            Create a lecturer or admin account. Students are managed by faculty via Courses.
+            Create your staff account to manage courses and biometric attendance.
           </p>
         </div>
         <Card className="gradient-border-card">
@@ -94,25 +94,7 @@ export function RegisterPage() {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Role</Label>
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                {(["lecturer", "admin"] as UserRole[]).map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRole(r)}
-                    className={`rounded-md border px-2 py-1 capitalize transition-colors ${
-                      role === r
-                        ? "border-sky-500 bg-sky-500/10 text-sky-100"
-                        : "border-border/70 bg-secondary/40 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
-                </div>
-              </div>
+
               {error && (
                 <div className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-100">
                   {error}
