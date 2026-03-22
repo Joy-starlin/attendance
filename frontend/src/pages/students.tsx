@@ -101,28 +101,28 @@ export function StudentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-white">Student Management</h1>
-          <p className="mt-1 text-sm text-slate-400">View and manage registered student profiles.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Student Management</h1>
+          <p className="mt-1 text-sm text-muted-foreground">View and manage registered student profiles.</p>
         </div>
         <div className="flex items-center gap-2">
-           <Button onClick={() => setShowRegisterModal(true)} className="bg-sky-600 hover:bg-sky-500 w-full sm:w-auto">
+           <Button onClick={() => setShowRegisterModal(true)} className="bg-primary hover:bg-primary w-full sm:w-auto">
              <Plus className="mr-2 h-4 w-4" /> <span className="hidden xs:inline">New Student</span>
            </Button>
            <Button variant="outline" onClick={load} disabled={loading} size="icon"><RefreshCw className="h-4 w-4" /></Button>
         </div>
       </div>
 
-      <Card className="gradient-border-card bg-slate-900/50">
+      <Card className="gradient-border-card bg-card/50">
         <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
            <div className="w-full max-w-sm">
              <div className="relative">
-               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
-               <Input className="pl-9 h-9 bg-slate-950/50 text-xs" placeholder="Search students..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+               <Input className="pl-9 h-9 bg-background/50 text-xs" placeholder="Search students..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
              </div>
            </div>
            <div className="flex gap-2 w-full md:w-auto">
              <Button variant="secondary" size="sm" className="flex-1 md:flex-none h-9 text-xs" onClick={() => generateStudentsPDF(filteredStudents)}><FileDown className="mr-2 h-4 w-4" />Export</Button>
-             <label className="flex flex-1 md:flex-none h-9 items-center justify-center gap-2 cursor-pointer bg-slate-950/50 border border-slate-800 rounded-md px-3 text-[11px] hover:bg-slate-800 transition-colors shrink-0 whitespace-nowrap overflow-hidden">
+             <label className="flex flex-1 md:flex-none h-9 items-center justify-center gap-2 cursor-pointer bg-background/50 border border-border rounded-md px-3 text-[11px] hover:bg-secondary transition-colors shrink-0 whitespace-nowrap overflow-hidden">
                 <Upload className="h-3.5 w-3.5" /> {csvStatus || "CSV Import"}
                 <input type="file" accept=".csv" className="hidden" disabled={!!csvStatus} onChange={async (e) => {
                   const file = e.target.files?.[0]; if (!file) return;
@@ -146,9 +146,9 @@ export function StudentsPage() {
            </div>
         </CardHeader>
         <CardContent>
-           <div className="overflow-x-auto rounded-lg border border-slate-800">
+           <div className="overflow-x-auto rounded-lg border border-border">
              <table className="w-full text-sm">
-               <thead className="bg-slate-950/50 text-[10px] uppercase text-slate-500 font-bold border-b border-slate-800">
+               <thead className="bg-background/50 text-[10px] uppercase text-muted-foreground font-bold border-b border-border">
                  <tr>
                    <th className="px-3 py-3 text-left">Reg No.</th>
                    <th className="px-3 py-3 text-left">Name</th>
@@ -159,19 +159,19 @@ export function StudentsPage() {
                </thead>
                <tbody className="divide-y divide-slate-800">
                  {filteredStudents.map(s => (
-                   <tr key={s.id} className="hover:bg-slate-800/30 transition-colors">
-                     <td className="px-3 py-3 text-xs font-mono text-sky-400">{s.student_id ? s.student_id.slice(-8) : "-"}</td>
+                   <tr key={s.id} className="hover:bg-secondary/30 transition-colors">
+                     <td className="px-3 py-3 text-xs font-mono text-primary">{s.student_id ? s.student_id.slice(-8) : "-"}</td>
                      <td className="px-3 py-3">
-                       <div className="font-medium text-slate-200 text-xs sm:text-sm">{s.name}</div>
+                       <div className="font-medium text-foreground text-xs sm:text-sm">{s.name}</div>
                      </td>
                      <td className="px-3 py-3 text-xs hidden sm:table-cell">Yr {s.year_of_study || 1}</td>
                      <td className="px-3 py-3">
-                       <div className={cn("h-1.5 w-1.5 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-slate-700")} />
+                       <div className={cn("h-1.5 w-1.5 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-muted")} />
                      </td>
                      <td className="px-3 py-3 text-right">
                        <div className="flex justify-end gap-1">
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-sky-400" onClick={() => handleLiveEnroll(s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setEditingStudent(s)}><Edit3 className="h-3.5 w-3.5" /></Button>
+                         <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleLiveEnroll(s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
+                         <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setEditingStudent(s)}><Edit3 className="h-3.5 w-3.5" /></Button>
                          <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => handleDeleteClick(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                        </div>
                      </td>
@@ -186,8 +186,8 @@ export function StudentsPage() {
       {/* Responsive Register Modal */}
       {showRegisterModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-sm border-slate-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <CardHeader className="border-b border-slate-800 bg-slate-900/50"><CardTitle>Register Student</CardTitle></CardHeader>
+          <Card className="w-full max-w-sm border-border shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <CardHeader className="border-b border-border bg-card/50"><CardTitle>Register Student</CardTitle></CardHeader>
             <form onSubmit={async (e) => {
               e.preventDefault(); setRegistering(true);
               try {
@@ -198,15 +198,15 @@ export function StudentsPage() {
               } catch (err: any) { showToast(err.message, "error"); } finally { setRegistering(false); }
             }}>
               <CardContent className="space-y-4 pt-4">
-                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Name</Label><Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="h-9" /></div>
+                <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Name</Label><Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="h-9" /></div>
                 <div className="grid grid-cols-1 gap-4">
-                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Reg No.</Label><Input required value={formData.student_id} onChange={e => setFormData({...formData, student_id: e.target.value})} className="h-9 font-mono" /></div>
-                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Year of Study</Label><Input required type="number" min="1" max="5" value={formData.year_of_study} onChange={e => setFormData({...formData, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
+                   <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Reg No.</Label><Input required value={formData.student_id} onChange={e => setFormData({...formData, student_id: e.target.value})} className="h-9 font-mono" /></div>
+                   <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Year of Study</Label><Input required type="number" min="1" max="5" value={formData.year_of_study} onChange={e => setFormData({...formData, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
                 </div>
               </CardContent>
-              <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
+              <div className="flex items-center justify-end gap-2 p-4 border-t border-border bg-background/20">
                 <Button variant="ghost" size="sm" onClick={() => setShowRegisterModal(false)}>Cancel</Button>
-                <Button size="sm" type="submit" disabled={registering} className="bg-sky-600 px-6">{registering ? "..." : "Save Student"}</Button>
+                <Button size="sm" type="submit" disabled={registering} className="bg-primary px-6">{registering ? "..." : "Save Student"}</Button>
               </div>
             </form>
           </Card>
@@ -216,8 +216,8 @@ export function StudentsPage() {
       {/* Responsive Edit Modal */}
       {editingStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-sm border-sky-500/30 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <CardHeader className="border-b border-slate-800 bg-slate-900/50"><CardTitle>Edit Profile</CardTitle></CardHeader>
+          <Card className="w-full max-w-sm border-primary/30 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <CardHeader className="border-b border-border bg-card/50"><CardTitle>Edit Profile</CardTitle></CardHeader>
             <form onSubmit={async (e) => {
               e.preventDefault();
               try {
@@ -228,15 +228,15 @@ export function StudentsPage() {
               } catch (err: any) { showToast(err.message, "error"); }
             }}>
               <CardContent className="space-y-4 pt-4">
-                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Full Name</Label><Input value={editingStudent.name || ""} onChange={e => setEditingStudent({...editingStudent, name: e.target.value})} className="h-9" /></div>
+                <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Full Name</Label><Input value={editingStudent.name || ""} onChange={e => setEditingStudent({...editingStudent, name: e.target.value})} className="h-9" /></div>
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Reg No.</Label><Input value={editingStudent.student_id || ""} onChange={e => setEditingStudent({...editingStudent, student_id: e.target.value})} className="h-9 font-mono" /></div>
-                  <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Year</Label><Input type="number" value={editingStudent.year_of_study || 1} onChange={e => setEditingStudent({...editingStudent, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
+                  <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Reg No.</Label><Input value={editingStudent.student_id || ""} onChange={e => setEditingStudent({...editingStudent, student_id: e.target.value})} className="h-9 font-mono" /></div>
+                  <div className="space-y-1"><Label className="text-xs text-muted-foreground uppercase">Year</Label><Input type="number" value={editingStudent.year_of_study || 1} onChange={e => setEditingStudent({...editingStudent, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
                 </div>
               </CardContent>
-              <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
+              <div className="flex items-center justify-end gap-2 p-4 border-t border-border bg-background/20">
                 <Button variant="ghost" size="sm" onClick={() => setEditingStudent(null)}>Cancel</Button>
-                <Button size="sm" type="submit" className="bg-sky-600 px-6">Update</Button>
+                <Button size="sm" type="submit" className="bg-primary px-6">Update</Button>
               </div>
             </form>
           </Card>
@@ -247,13 +247,13 @@ export function StudentsPage() {
       {deletingId && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <Card className="w-full max-w-sm border-rose-500/30 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <CardHeader className="border-b border-slate-800 bg-slate-900/50">
+            <CardHeader className="border-b border-border bg-card/50">
               <CardTitle className="text-rose-500 text-lg">Delete Student</CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 text-sm text-slate-300">
+            <CardContent className="pt-4 text-sm text-foreground/80">
               Are you sure you want to delete this student? This action cannot be undone and will remove all their attendance and biometric data.
             </CardContent>
-            <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
+            <div className="flex items-center justify-end gap-2 p-4 border-t border-border bg-background/20">
               <Button variant="ghost" size="sm" onClick={() => setDeletingId(null)}>Cancel</Button>
               <Button size="sm" variant="destructive" onClick={async () => {
                 try {
@@ -270,7 +270,7 @@ export function StudentsPage() {
       {toastMsg && (
         <div className="fixed bottom-4 right-4 z-[70] animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div className={cn("flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg border text-sm font-medium", 
-            toastMsg.type === 'success' ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-400" : "bg-rose-950/90 border-rose-500/50 text-rose-400"
+            toastMsg.type === 'success' ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-500" : "bg-rose-950/90 border-rose-500/50 text-rose-500"
           )}>
             {toastMsg.type === 'success' ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
             {toastMsg.text}

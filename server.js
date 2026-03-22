@@ -318,7 +318,7 @@ app.put('/api/students/:id', authMiddleware, async (req, res) => {
   const { name, email, student_id, year_of_study } = req.body;
   try {
     await db.execute(
-      'UPDATE users SET name = ?, email = ?, student_id = ?, year_of_study = ? WHERE id = ? AND role = "student"',
+      "UPDATE users SET name = ?, email = ?, student_id = ?, year_of_study = ? WHERE id = ? AND role = 'student'",
       [name, email, student_id, year_of_study, req.params.id]
     );
     res.json({ success: true });
@@ -332,7 +332,7 @@ app.delete('/api/students/:id', authMiddleware, async (req, res) => {
     await db.execute('DELETE FROM attendance WHERE student_id = ?', [sid]);
     await db.execute('DELETE FROM fingerprints WHERE student_id = ?', [sid]);
     await db.execute('DELETE FROM student_courses WHERE student_id = ?', [sid]);
-    await db.execute('DELETE FROM users WHERE id = ? AND role = "student"', [sid]);
+    await db.execute("DELETE FROM users WHERE id = ? AND role = 'student'", [sid]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -511,7 +511,7 @@ app.post('/api/sessions', authMiddleware, async (req, res) => {
 
 app.post('/api/sessions/:id/stop', authMiddleware, async (req, res) => {
   try {
-    await db.execute('UPDATE sessions SET status = "completed", ended_at = NOW() WHERE id = ?', [req.params.id]);
+    await db.execute("UPDATE sessions SET status = 'completed', ended_at = NOW() WHERE id = ?", [req.params.id]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

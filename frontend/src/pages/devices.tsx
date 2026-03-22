@@ -98,11 +98,11 @@ export function DevicesPage() {
             <table className="min-w-full border-collapse text-sm">
               <thead>
                 <tr className="border-b border-border/60 bg-secondary/40 text-[10px] uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3 text-left">Hardware ID</th>
                   <th className="px-4 py-3 text-left">Friendly Name</th>
+                  <th className="px-4 py-3 text-left hidden sm:table-cell">Hardware ID</th>
                   <th className="px-4 py-3 text-left">Status</th>
-                  <th className="px-4 py-3 text-left">Signal Strength</th>
-                  <th className="px-4 py-3 text-left">Last Heartbeat</th>
+                  <th className="px-4 py-3 text-left hidden md:table-cell">Signal Strength</th>
+                  <th className="px-4 py-3 text-left hidden sm:table-cell">Last Heartbeat</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,26 +118,28 @@ export function DevicesPage() {
                       key={d.id}
                       className="border-b border-border/40 last:border-0 hover:bg-secondary/20 transition-colors"
                     >
-                      <td className="px-4 py-3 font-mono text-[10px] text-sky-300">
-                        {d.id}
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-xs sm:text-sm">{d.name || "Device " + d.id.slice(-4)}</div>
+                        <div className="text-[9px] font-mono text-muted-foreground mt-0.5 sm:hidden">{d.id}</div>
+                        <div className="text-[9px] text-muted-foreground mt-0.5 sm:hidden">{formatDateTime(d.last_seen)}</div>
                       </td>
-                      <td className="px-4 py-3 font-medium">
-                        {d.name || "Device " + d.id.slice(-4)}
+                      <td className="px-4 py-3 font-mono text-[10px] text-primary hidden sm:table-cell">
+                        {d.id}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <div className={cn("h-1.5 w-1.5 rounded-full", d.status === 'online' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-slate-500")} />
+                          <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", d.status === 'online' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-muted-foreground")} />
                           <span className="capitalize text-xs">{d.status}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 hidden md:table-cell">
                         <div className="flex items-center gap-1">
                           {[1,2,3,4].map(bar => (
-                            <div key={bar} className={cn("w-1 rounded-sm", bar <= (d.signal_strength || 3) ? "h-3 bg-sky-400" : "h-1 bg-slate-700")} />
+                            <div key={bar} className={cn("w-1 rounded-sm", bar <= (d.signal_strength || 3) ? "h-3 bg-sky-400" : "h-1 bg-muted")} />
                           ))}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      <td className="px-4 py-3 text-xs text-muted-foreground hidden sm:table-cell">
                         {formatDateTime(d.last_seen)}
                       </td>
                     </tr>

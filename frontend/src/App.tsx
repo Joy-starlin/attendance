@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { ThemeProvider } from "@/components/theme-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { LoginPage } from "@/pages/login";
 import { RegisterPage } from "@/pages/register";
@@ -26,43 +27,45 @@ function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <RedirectIfAuthed>
-              <LoginPage />
-            </RedirectIfAuthed>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <RedirectIfAuthed>
-              <RegisterPage />
-            </RedirectIfAuthed>
-          }
-        />
+    <ThemeProvider defaultTheme="system" storageKey="bugema-ui-theme">
+      <AuthProvider>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <RedirectIfAuthed>
+                <LoginPage />
+              </RedirectIfAuthed>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RedirectIfAuthed>
+                <RegisterPage />
+              </RedirectIfAuthed>
+            }
+          />
 
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <AppShell />
-            </RequireAuth>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="courses" element={<CoursesPage />} />
-          <Route path="devices" element={<DevicesPage />} />
-          <Route path="students" element={<StudentsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <AppShell />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="courses" element={<CoursesPage />} />
+            <Route path="devices" element={<DevicesPage />} />
+            <Route path="students" element={<StudentsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

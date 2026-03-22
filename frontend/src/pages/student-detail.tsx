@@ -65,7 +65,7 @@ export function StudentDetailPage() {
             Refresh
           </Button>
           <Button 
-            className="bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/20" 
+            className="bg-primary hover:bg-primary text-foreground shadow-lg shadow-sky-900/20" 
             size="sm"
             onClick={async () => {
               const d = await api.devices();
@@ -99,7 +99,7 @@ export function StudentDetailPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Student ID</span>
-              <span className="font-mono text-xs text-sky-200">
+              <span className="font-mono text-xs text-primary/80">
                 {student?.student_id ?? "—"}
               </span>
             </div>
@@ -122,7 +122,7 @@ export function StudentDetailPage() {
                 Templates registered for this student on biometric devices.
               </CardDescription>
             </div>
-            <FingerprintIcon className="h-5 w-5 text-sky-300" />
+            <FingerprintIcon className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
             {fps.length === 0 ? (
@@ -185,7 +185,7 @@ export function StudentDetailPage() {
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Select Hardware Device</label>
                       <select 
-                        className="w-full bg-background/50 border border-border/60 rounded-md p-2 text-sm focus:ring-1 focus:ring-sky-500"
+                        className="w-full bg-background/50 border border-border/60 rounded-md p-2 text-sm focus:ring-1 focus:ring-primary"
                         value={selectedDeviceId}
                         onChange={(e) => setSelectedDeviceId(e.target.value)}
                       >
@@ -198,7 +198,7 @@ export function StudentDetailPage() {
                       </select>
                     </div>
                     <Button 
-                      className="w-full bg-sky-600 hover:bg-sky-500" 
+                      className="w-full bg-primary hover:bg-primary" 
                       onClick={async () => {
                         setEnrolling(true);
                         setEnrollStatus({ status: 'STARTING', message: 'Waiting for device response...' });
@@ -236,19 +236,19 @@ export function StudentDetailPage() {
                       <div className={`p-6 rounded-full border-4 transition-all duration-500 ${
                         enrollStatus?.status === 'SUCCESS' ? 'border-emerald-500 bg-emerald-500/10' :
                         enrollStatus?.status.startsWith('ERROR') ? 'border-rose-500 bg-rose-500/10' :
-                        'border-sky-500/30 bg-sky-500/5 animate-pulse'
+                        'border-primary/30 bg-primary/5 animate-pulse'
                       }`}>
                         {enrollStatus?.status === 'SUCCESS' ? (
-                          <CheckCircle className="h-12 w-12 text-emerald-400" />
+                          <CheckCircle className="h-12 w-12 text-emerald-500" />
                         ) : enrollStatus?.status.startsWith('ERROR') ? (
-                          <AlertCircle className="h-12 w-12 text-rose-400" />
+                          <AlertCircle className="h-12 w-12 text-rose-500" />
                         ) : (
-                          <FingerprintIcon className="h-12 w-12 text-sky-400" />
+                          <FingerprintIcon className="h-12 w-12 text-primary" />
                         )}
                       </div>
                       {(!enrollStatus?.status.includes('SUCCESS') && !enrollStatus?.status.includes('ERROR')) && (
                         <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 border border-border">
-                          <Loader2 className="h-4 w-4 animate-spin text-sky-400" />
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
                         </div>
                       )}
                     </div>
@@ -267,8 +267,8 @@ export function StudentDetailPage() {
                     </div>
 
                     <div className="w-full max-w-[200px] flex justify-between px-2">
-                       <div className={`h-2 w-12 rounded-full ${['WAITING_FOR_SCAN_1', 'SCAN_1_OK', 'WAITING_FOR_SCAN_2', 'SUCCESS'].includes(enrollStatus?.status || '') ? 'bg-sky-500' : 'bg-secondary'}`} />
-                       <div className={`h-2 w-12 rounded-full ${['WAITING_FOR_SCAN_2', 'SUCCESS'].includes(enrollStatus?.status || '') ? 'bg-sky-500' : 'bg-secondary'}`} />
+                       <div className={`h-2 w-12 rounded-full ${['WAITING_FOR_SCAN_1', 'SCAN_1_OK', 'WAITING_FOR_SCAN_2', 'SUCCESS'].includes(enrollStatus?.status || '') ? 'bg-primary' : 'bg-secondary'}`} />
+                       <div className={`h-2 w-12 rounded-full ${['WAITING_FOR_SCAN_2', 'SUCCESS'].includes(enrollStatus?.status || '') ? 'bg-primary' : 'bg-secondary'}`} />
                        <div className={`h-2 w-12 rounded-full ${enrollStatus?.status === 'SUCCESS' ? 'bg-emerald-500' : 'bg-secondary'}`} />
                     </div>
                   </div>

@@ -70,7 +70,7 @@ export function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             Faculty Command Center
           </p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">
@@ -85,10 +85,10 @@ export function DashboardPage() {
              const data = await fetchSemesterReport();
              generateSemesterPDF(data);
           }}>
-            <FileText className="mr-2 h-4 w-4 text-sky-400" />
+            <FileText className="mr-2 h-4 w-4 text-primary" />
             Semester Report
           </Button>
-          <Button size="sm" className="bg-sky-600 hover:bg-sky-500" onClick={() => navigate("/students")}>
+          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => navigate("/students")}>
             <Fingerprint className="mr-2 h-4 w-4" />
             Quick Enroll
           </Button>
@@ -96,10 +96,10 @@ export function DashboardPage() {
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <Card className="bg-sky-500/5 border-sky-500/20">
+        <Card className="bg-primary/5 border-primary/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-sky-400">Courses</CardTitle>
-            <GraduationCap className="h-4 w-4 text-sky-400" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-primary">Courses</CardTitle>
+            <GraduationCap className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? "—" : stats.courses}</div>
@@ -107,8 +107,8 @@ export function DashboardPage() {
         </Card>
         <Card className="bg-emerald-500/5 border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Students</CardTitle>
-            <Users className="h-4 w-4 text-emerald-400" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-500">Students</CardTitle>
+            <Users className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? "—" : stats.students}</div>
@@ -116,8 +116,8 @@ export function DashboardPage() {
         </Card>
         <Card className="bg-violet-500/5 border-violet-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-violet-400">Terminals</CardTitle>
-            <Cpu className="h-4 w-4 text-violet-400" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-violet-500">Terminals</CardTitle>
+            <Cpu className="h-4 w-4 text-violet-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? "—" : stats.devices}</div>
@@ -130,7 +130,7 @@ export function DashboardPage() {
           <Card className="gradient-border-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PlayCircle className="h-5 w-5 text-sky-400" />
+                <PlayCircle className="h-5 w-5 text-primary" />
                 Management hub
               </CardTitle>
               <CardDescription>Start teaching sessions or manage your registered devices.</CardDescription>
@@ -148,7 +148,7 @@ export function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="h-4 w-4 text-rose-400" />
+                <Activity className="h-4 w-4 text-destructive" />
                 Live Terminal Activity
               </CardTitle>
             </CardHeader>
@@ -160,7 +160,7 @@ export function DashboardPage() {
                   logs.attendance.map((log: any) => (
                     <div key={log.id} className="flex items-center justify-between rounded-md bg-secondary/20 p-3 text-sm">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
                           <Fingerprint className="h-4 w-4" />
                         </div>
                         <div>
@@ -189,7 +189,7 @@ export function DashboardPage() {
                 logs.devices.map((d: any) => (
                   <div key={d.id} className="flex items-center justify-between border-b border-border/40 pb-2 last:border-0 last:pb-0">
                     <div>
-                      <div className="text-xs font-medium text-sky-200">{d.name || d.id}</div>
+                      <div className="text-xs font-semibold text-foreground">{d.name || d.id}</div>
                       <div className="text-[9px] text-muted-foreground">ID: {d.id}</div>
                     </div>
                     <div className="flex flex-col items-end">
@@ -199,7 +199,7 @@ export function DashboardPage() {
                   </div>
                 ))
               )}
-              <Button variant="ghost" size="sm" className="w-full mt-2 text-[10px] text-sky-400" onClick={() => navigate("/devices")}>
+              <Button variant="ghost" size="sm" className="w-full mt-2 text-[10px] text-primary" onClick={() => navigate("/devices")}>
                 View all devices
               </Button>
             </CardContent>

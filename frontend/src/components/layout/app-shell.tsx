@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { formatRole } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ import {
   LogOut,
   Menu,
   X,
+  Sun,
+  Moon
 } from "lucide-react";
 
 const navItems = [
@@ -27,6 +30,7 @@ const navItems = [
 
 export function AppShell() {
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
@@ -34,7 +38,7 @@ export function AppShell() {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_45%),radial-gradient(ellipse_at_bottom,rgba(129,140,248,0.10),transparent_55%)]">
+    <div className="min-h-screen bg-background text-foreground dark:bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_45%),radial-gradient(ellipse_at_bottom,rgba(129,140,248,0.10),transparent_55%)]">
       {/* Top Bar */}
       <div className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-3 sm:px-6">
@@ -57,6 +61,16 @@ export function AppShell() {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground mr-1"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
             <div className="hidden text-right md:block">
               <div className="text-sm font-medium leading-none mb-1">{user?.name}</div>
               <div className="text-[10px] text-muted-foreground">
@@ -83,7 +97,7 @@ export function AppShell() {
         {/* Sidebar - Desktop */}
         <aside className="hidden border-r border-border/60 bg-background/30 backdrop-blur lg:block min-h-[calc(100vh-3.5rem)]">
           <div className="flex h-full w-64 flex-col px-3 py-6">
-            <div className="px-3 pb-3 text-xs font-semibold uppercase tracking-wider text-sky-400/80">
+            <div className="px-3 pb-3 text-xs font-semibold uppercase tracking-wider text-primary/80">
               Faculty Menu
             </div>
             <nav className="space-y-1">
@@ -94,8 +108,8 @@ export function AppShell() {
                   end={(item as any).end}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-sky-500/10 hover:text-sky-100",
-                      isActive && "bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20"
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-primary/10 hover:text-primary",
+                      isActive && "bg-primary/10 text-primary ring-1 ring-primary/20"
                     )
                   }
                 >
@@ -113,7 +127,7 @@ export function AppShell() {
             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeMenu} />
             <aside className="absolute bottom-0 left-0 top-14 w-64 border-r border-border/60 bg-background shadow-2xl animate-in slide-in-from-left duration-300">
               <div className="flex h-full flex-col px-3 py-6">
-                <div className="px-3 pb-3 text-xs font-semibold uppercase tracking-wider text-sky-400/80">
+                <div className="px-3 pb-3 text-xs font-semibold uppercase tracking-wider text-primary/80">
                   Faculty Menu
                 </div>
                 <nav className="space-y-1">
@@ -125,8 +139,8 @@ export function AppShell() {
                       onClick={closeMenu}
                       className={({ isActive }) =>
                         cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-sky-500/10 hover:text-sky-100",
-                          isActive && "bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20"
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-primary/10 hover:text-primary",
+                          isActive && "bg-primary/10 text-primary ring-1 ring-primary/20"
                         )
                       }
                     >

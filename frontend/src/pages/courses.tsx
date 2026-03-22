@@ -192,7 +192,7 @@ export function CoursesPage() {
 
       {/* Forms Grid Fix */}
       {showAddCourse && (
-        <Card className="border-sky-500/40">
+        <Card className="border-primary/40">
           <CardHeader className="pb-2"><CardTitle className="text-sm">New Course Unit</CardTitle></CardHeader>
           <CardContent>
             <form className="grid gap-4 grid-cols-1 sm:grid-cols-4" onSubmit={addCourse}>
@@ -229,11 +229,11 @@ export function CoursesPage() {
           <CardHeader className="pb-2"><CardTitle className="text-sm">Edit Course</CardTitle></CardHeader>
           <CardContent>
             <form className="grid gap-4 grid-cols-1 sm:grid-cols-4" onSubmit={updateCourse}>
-               <div className="space-y-1 sm:col-span-1"><Label className="text-xs text-slate-500">Code</Label><Input className="h-8 text-xs" value={editingCourse.code} onChange={e => setEditingCourse({...editingCourse, code: e.target.value})} /></div>
-               <div className="space-y-1 sm:col-span-2"><Label className="text-xs text-slate-500">Name</Label><Input className="h-8 text-xs" value={editingCourse.name} onChange={e => setEditingCourse({...editingCourse, name: e.target.value})} /></div>
+               <div className="space-y-1 sm:col-span-1"><Label className="text-xs text-muted-foreground">Code</Label><Input className="h-8 text-xs" value={editingCourse.code} onChange={e => setEditingCourse({...editingCourse, code: e.target.value})} /></div>
+               <div className="space-y-1 sm:col-span-2"><Label className="text-xs text-muted-foreground">Name</Label><Input className="h-8 text-xs" value={editingCourse.name} onChange={e => setEditingCourse({...editingCourse, name: e.target.value})} /></div>
                <div className="grid grid-cols-2 gap-2 sm:col-span-1">
-                 <div className="space-y-1"><Label className="text-[10px] text-slate-500">Total</Label><Input className="h-8 text-xs" type="number" value={editingCourse.total_classes} onChange={e => setEditingCourse({...editingCourse, total_classes: +e.target.value})} /></div>
-                 <div className="space-y-1"><Label className="text-[10px] text-slate-500">Pass%</Label><Input className="h-8 text-xs" type="number" value={editingCourse.pass_criteria} onChange={e => setEditingCourse({...editingCourse, pass_criteria: +e.target.value})} /></div>
+                 <div className="space-y-1"><Label className="text-[10px] text-muted-foreground">Total</Label><Input className="h-8 text-xs" type="number" value={editingCourse.total_classes} onChange={e => setEditingCourse({...editingCourse, total_classes: +e.target.value})} /></div>
+                 <div className="space-y-1"><Label className="text-[10px] text-muted-foreground">Pass%</Label><Input className="h-8 text-xs" type="number" value={editingCourse.pass_criteria} onChange={e => setEditingCourse({...editingCourse, pass_criteria: +e.target.value})} /></div>
                </div>
                <div className="flex gap-2 sm:col-span-4 pt-1">
                 <Button type="submit" size="sm" className="h-8 text-xs">Update</Button>
@@ -256,10 +256,10 @@ export function CoursesPage() {
               <div className="p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3 cursor-pointer" onClick={() => toggleExpand(course.id)}>
-                    {isOpen ? <ChevronDown className="h-5 w-5 text-sky-400" /> : <ChevronRight className="h-5 w-5 text-slate-500" />}
+                    {isOpen ? <ChevronDown className="h-5 w-5 text-primary" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                     <div>
-                      <h3 className="font-semibold text-slate-100">{course.code}</h3>
-                      <p className="text-xs text-slate-400">{course.name}</p>
+                      <h3 className="font-semibold text-foreground">{course.code}</h3>
+                      <p className="text-xs text-muted-foreground">{course.name}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -276,7 +276,7 @@ export function CoursesPage() {
                       <FileDown className="mr-1.5 h-3.5 w-3.5" /> Report
                     </Button>
                     <div className="flex gap-1 ml-1 pl-1 border-l border-border/40">
-                      <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setEditingCourse(course)}><Edit3 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setEditingCourse(course)}><Edit3 className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => deleteCourse(course.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
@@ -292,13 +292,13 @@ export function CoursesPage() {
                         <Upload className="h-3.5 w-3.5" /> Batch Import (CSV)
                         <input type="file" accept=".csv" className="hidden" onChange={(e) => handleCSVUpload(course.id, e)} />
                       </label>
-                      {csvStatus[course.id] && <span className="text-[10px] text-sky-400 italic">{csvStatus[course.id]}</span>}
+                      {csvStatus[course.id] && <span className="text-[10px] text-primary italic">{csvStatus[course.id]}</span>}
                     </div>
 
                     {showAddStudent === course.id && (
-                      <div className="flex flex-col sm:flex-row sm:items-end gap-3 rounded-lg bg-slate-900/40 p-3 border border-slate-800">
-                        <div className="w-full sm:flex-1"><Label className="text-[10px] text-slate-500">Full Name</Label><Input className="h-8 text-xs" value={manualStudent.name} onChange={e => setManualStudent({...manualStudent, name:e.target.value})} /></div>
-                        <div className="w-full sm:w-48"><Label className="text-[10px] text-slate-500">Reg No.</Label><Input className="h-8 text-xs font-mono" value={manualStudent.student_id} onChange={e => setManualStudent({...manualStudent, student_id:e.target.value})} /></div>
+                      <div className="flex flex-col sm:flex-row sm:items-end gap-3 rounded-lg bg-card/40 p-3 border border-border">
+                        <div className="w-full sm:flex-1"><Label className="text-[10px] text-muted-foreground">Full Name</Label><Input className="h-8 text-xs" value={manualStudent.name} onChange={e => setManualStudent({...manualStudent, name:e.target.value})} /></div>
+                        <div className="w-full sm:w-48"><Label className="text-[10px] text-muted-foreground">Reg No.</Label><Input className="h-8 text-xs font-mono" value={manualStudent.student_id} onChange={e => setManualStudent({...manualStudent, student_id:e.target.value})} /></div>
                         <div className="flex gap-2 w-full sm:w-auto justify-end">
                           <Button size="sm" className="h-8" onClick={() => enrollSingleStudent(course.id)}>Add</Button>
                           <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowAddStudent(null)}><X className="h-4 w-4" /></Button>
@@ -308,7 +308,7 @@ export function CoursesPage() {
 
                     <div className="overflow-x-auto rounded-lg border border-border/60">
                       <table className="w-full text-sm">
-                        <thead className="bg-slate-950/50 text-[10px] uppercase text-slate-500 font-bold border-b border-border/60">
+                        <thead className="bg-background/50 text-[10px] uppercase text-muted-foreground font-bold border-b border-border/60">
                           <tr>
                             <th className="px-3 py-2 text-left">Student</th>
                             <th className="px-3 py-2 text-left">Reg No.</th>
@@ -321,16 +321,16 @@ export function CoursesPage() {
                           {courseStudents.map(s => {
                             const pct = s.total_sessions > 0 ? Math.round((s.classes_attended / s.total_sessions) * 100) : 0;
                             return (
-                              <tr key={s.id} className="hover:bg-slate-800/30">
-                                <td className="px-3 py-2 whitespace-nowrap"><div className="font-medium text-slate-200">{s.name}</div></td>
-                                <td className="px-3 py-2 font-mono text-xs text-sky-400 whitespace-nowrap">{s.student_id || "-"}</td>
+                              <tr key={s.id} className="hover:bg-secondary/30">
+                                <td className="px-3 py-2 whitespace-nowrap"><div className="font-medium text-foreground">{s.name}</div></td>
+                                <td className="px-3 py-2 font-mono text-xs text-primary whitespace-nowrap">{s.student_id || "-"}</td>
                                 <td className="px-3 py-2 text-center text-xs">{pct}%</td>
                                 <td className="px-3 py-2 text-center">
-                                  <div className={cn("h-2 w-2 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-slate-700")} />
+                                  <div className={cn("h-2 w-2 rounded-full mx-auto", s.has_fingerprint ? "bg-emerald-500" : "bg-muted")} />
                                 </td>
                                 <td className="px-3 py-2 text-right">
                                   <div className="flex justify-end gap-1">
-                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-sky-400" onClick={() => triggerEnroll(course.id, s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
+                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-primary" onClick={() => triggerEnroll(course.id, s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
                                     <Button size="icon" variant="ghost" className="h-7 w-7 text-rose-500" onClick={() => unenrollStudent(course.id, s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                                   </div>
                                 </td>

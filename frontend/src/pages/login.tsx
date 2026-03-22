@@ -43,13 +43,13 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(129,140,248,0.22),transparent_55%)]">
       <div className="w-full max-w-[400px]">
         <div className="mb-8 text-center px-2">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950/70 text-sky-400 ring-1 ring-sky-500/40">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
             <Fingerprint className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50 mb-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
             Faculty Portal
           </h1>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-muted-foreground">
             Secure login for lecturers and administrators.
           </p>
         </div>
@@ -106,7 +106,7 @@ export function LoginPage() {
           <CardFooter className="flex justify-center text-xs text-muted-foreground">
             <Link
               to="/register"
-              className="font-medium text-sky-300 hover:text-sky-200"
+              className="font-medium text-primary hover:text-primary/80"
             >
               Need an account?
             </Link>
