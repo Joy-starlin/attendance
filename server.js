@@ -314,6 +314,29 @@ app.get('/api/students/:id', authMiddleware, async (req, res) => {
   res.json(rows[0]);
 });
 
+app.put('/api/students/:id', authMiddleware, async (req, res) => {
+  const { name, email, student_id, year_of_study } = req.body;
+  try {
+    await db.execute(
+      'UPDATE users SET name = ?, email = ?, student_id = ?, year_of_study = ? WHERE id = ? AND role = "student"',
+      [name, email, student_id, year_of_study, req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/students/:id', authMiddleware, async (req, res) => {
+  try {
+    const sid = req.params.id;
+    // Cleanup everything
+    await db.execute('DELETE FROM attendance WHERE student_id = ?', [sid]);
+    await db.execute('DELETE FROM fingerprints WHERE student_id = ?', [sid]);
+    await db.execute('DELETE FROM student_courses WHERE student_id = ?', [sid]);
+    await db.execute('DELETE FROM users WHERE id = ? AND role = "student"', [sid]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // STUDENTS per COURSE
 app.get('/api/courses/:id/students', authMiddleware, async (req, res) => {
   try {
