@@ -476,10 +476,17 @@ app.get('/v1/session/active', async (req, res) => {
 
 app.post('/v1/device/heartbeat', async (req, res) => {
   const { device_id, session_active, offline_queue } = req.body;
-  await db.execute(
-    "INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'", 
-    [device_id]
-  ).catch(() => {});
+  if (isPostgres) {
+    await db.execute(
+      "INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON CONFLICT (id) DO UPDATE SET last_seen = NOW(), status = 'online'",
+      [device_id]
+    ).catch(() => {});
+  } else {
+    await db.execute(
+      "INSERT INTO devices (id, last_seen, status) VALUES (?, NOW(), 'online') ON DUPLICATE KEY UPDATE last_seen = NOW(), status = 'online'",
+      [device_id]
+    ).catch(() => {});
+  }
   
   const pending = deviceCommands.get(device_id);
   if (pending) {
@@ -514,11 +521,61 @@ app.post('/v1/fingerprint/register', async (req, res) => {
   const { device_id, fp_id, student_id } = req.body;
   const id = uuidv4();
   try {
-    await db.execute(
-      'INSERT INTO fingerprints (id, student_id, finger_number, device_id) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE student_id = ?',
-      [id, student_id, fp_id, device_id, student_id]
-    );
+    if (isPostgres) {
+      await db.execute(
+        'INSERT INTO fingerprints (id, student_id, finger_number, device_id) VALUES (?,?,?,?) ON CONFLICT (student_id, finger_number, device_id) DO UPDATE SET student_id = EXCLUDED.student_id',
+        [id, student_id, fp_id, device_id]
+      );
+    } else {
+      await db.execute(
+        'INSERT INTO fingerprints (id, student_id, finger_number, device_id) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE student_id = ?',
+        [id, student_id, fp_id, device_id, student_id]
+      );
+    }
     res.status(201).json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/students/bulk', authMiddleware, async (req, res) => {
+  const { students } = req.body;
+  if (!Array.isArray(students)) return res.status(400).json({ error: 'Invalid students array' });
+  const results = { added: 0, skipped: 0 };
+  for (const s of students) {
+    try {
+      const id = uuidv4();
+      const pwd = bcrypt.hashSync(s.password || 'changeme123', 10);
+      await db.execute(
+        "INSERT INTO users (id, name, email, password_hash, role, student_id) VALUES (?, ?, ?, ?, 'student', ?)",
+        [id, s.name, s.email, pwd, s.student_id]
+      );
+      results.added++;
+    } catch (e) { results.skipped++; }
+  }
+  res.json(results);
+});
+
+app.get('/api/reports/semester', authMiddleware, async (req, res) => {
+  try {
+    const [report] = await db.execute(`
+      SELECT u.name, u.student_id as reg_no, c.name as course, 
+             COUNT(a.id) as attended, 
+             (SELECT COUNT(*) FROM sessions s WHERE s.course_id = c.id) as total
+      FROM users u
+      JOIN student_courses sc ON u.id = sc.student_id
+      JOIN courses c ON sc.course_id = c.id
+      LEFT JOIN attendance a ON u.id = a.student_id AND a.course_id = c.id
+      WHERE (c.lecturer_id = ? OR ? IN (SELECT id FROM users WHERE role = 'admin'))
+      GROUP BY u.id, c.id, u.name, u.student_id, c.name
+    `, [req.user.id, req.user.id]);
+    res.json(report);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/logs', authMiddleware, async (req, res) => {
+  try {
+    const [logs] = await db.execute('SELECT * FROM attendance ORDER BY marked_at DESC LIMIT 10');
+    const [devices] = await db.execute('SELECT id, name, last_seen FROM devices ORDER BY last_seen DESC LIMIT 5');
+    res.json({ attendance: logs, devices });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

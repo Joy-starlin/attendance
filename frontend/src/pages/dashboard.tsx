@@ -1,176 +1,211 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatRole } from "@/lib/format";
-import { GraduationCap, Users, Cpu, PlayCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { formatDateTime } from "@/lib/format";
+import { GraduationCap, Users, Cpu, PlayCircle, FileText, Fingerprint, Activity } from "lucide-react";
+
+async function fetchLogs() {
+  const token = localStorage.getItem("token");
+  const res = await fetch("/api/logs", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.json();
+}
+
+async function fetchSemesterReport() {
+  const token = localStorage.getItem("token");
+  const res = await fetch("/api/reports/semester", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.json();
+}
+
+function generateSemesterPDF(data: any[]) {
+  const win = window.open("", "_blank")!;
+  const rows = data.map((r, i) => `
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #eee">${r.name}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee">${r.reg_no}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee">${r.course}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${r.attended} / ${r.total}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${Math.round((r.attended/r.total)*100 || 0)}%</td>
+    </tr>
+  `).join("");
+  win.document.write(`<html><head><title>Semester Report</title></head><body><h1>Semester Attendance Summary</h1><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f1f5f9"><th>Name</th><th>Reg No</th><th>Course</th><th>Sessions</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.close();
+}
 
 export function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(true);
-  const [stats, setStats] = React.useState<{
-    courses: number;
-    students: number;
-    devices: number;
-  }>({ courses: 0, students: 0, devices: 0 });
+  const [stats, setStats] = React.useState({ courses: 0, students: 0, devices: 0 });
+  const [logs, setLogs] = React.useState<any>({ attendance: [], devices: [] });
 
   React.useEffect(() => {
     async function load() {
       try {
-        const [courses, students, devices] = await Promise.all([
+        const [courses, students, devices, sysLogs] = await Promise.all([
           api.courses().catch(() => []),
           api.students().catch(() => []),
           api.devices().catch(() => []),
+          fetchLogs().catch(() => ({ attendance: [], devices: [] }))
         ]);
-        setStats({
-          courses: courses.length,
-          students: students.length,
-          devices: devices.length,
-        });
+        setStats({ courses: courses.length, students: students.length, devices: devices.length });
+        setLogs(sysLogs);
       } finally {
         setLoading(false);
       }
     }
     load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
-            System Overview
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
+            Faculty Command Center
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            Welcome back, {user?.name}
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">
+            Hi, {user?.name?.split(' ')[0]}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Monitor biometric sessions, student coverage, and device health at a glance.
+            {stats.devices > 0 ? `🟢 ${stats.devices} biometric units are live.` : "🔴 No active terminals detected."}
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="bg-background/50" onClick={async () => {
+             const data = await fetchSemesterReport();
+             generateSemesterPDF(data);
+          }}>
+            <FileText className="mr-2 h-4 w-4 text-sky-400" />
+            Semester Report
+          </Button>
+          <Button size="sm" className="bg-sky-600 hover:bg-sky-500" onClick={() => navigate("/students")}>
+            <Fingerprint className="mr-2 h-4 w-4" />
+            Quick Enroll
+          </Button>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
+        <Card className="bg-sky-500/5 border-sky-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Courses</CardTitle>
-            <GraduationCap className="h-4 w-4 text-sky-300" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-sky-400">Your Courses</CardTitle>
+            <GraduationCap className="h-4 w-4 text-sky-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold">
-              {loading ? "—" : stats.courses.toLocaleString()}
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Active teaching units.
-            </p>
+            <div className="text-2xl font-bold">{loading ? "—" : stats.courses}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-emerald-500/5 border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Students</CardTitle>
-            <Users className="h-4 w-4 text-emerald-300" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Student Directory</CardTitle>
+            <Users className="h-4 w-4 text-emerald-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold">
-              {loading ? "—" : stats.students.toLocaleString()}
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Total registered profiles.
-            </p>
+            <div className="text-2xl font-bold">{loading ? "—" : stats.students}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-violet-500/5 border-violet-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Devices</CardTitle>
-            <Cpu className="h-4 w-4 text-violet-300" />
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-violet-400">Online Terminals</CardTitle>
+            <Cpu className="h-4 w-4 text-violet-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold">
-              {loading ? "—" : stats.devices.toLocaleString()}
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Connected biometric units.
-            </p>
+            <div className="text-2xl font-bold">{loading ? "—" : stats.devices}</div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
-        <Card className="gradient-border-card transition-all duration-300 hover:shadow-sky-500/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Quick actions</CardTitle>
-              <CardDescription>
-                Start a live session and track attendance in real time.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3 pt-4">
-            <Button size="lg" className="gap-2" onClick={() => navigate("/courses")}>
-              <PlayCircle className="h-4 w-4" />
-              Start attendance session
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/courses")}>
-              Manage Courses
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/devices")}>
-              Device Status
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
+        <div className="space-y-6">
+          <Card className="gradient-border-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PlayCircle className="h-5 w-5 text-sky-400" />
+                Management hub
+              </CardTitle>
+              <CardDescription>Start teaching sessions or manage your registered devices.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button size="lg" className="h-12 px-6" onClick={() => navigate("/courses")}>
+                Start Attendance Session
+              </Button>
+              <Button variant="secondary" size="lg" className="h-12 px-6" onClick={() => navigate("/students")}>
+                Manage Records
+              </Button>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Latest biometric scans from terminals.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground pb-4">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <div>
-                  <div className="text-slate-200">Alice Johnson</div>
-                  <div className="text-xs">ENG-101 (ESP32-Hall-A)</div>
-                </div>
-                <div className="text-xs text-sky-300">2 mins ago</div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4 text-rose-400" />
+                Live Terminal Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {logs.attendance.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic py-4">Waiting for first scan of the day...</p>
+                ) : (
+                  logs.attendance.map((log: any) => (
+                    <div key={log.id} className="flex items-center justify-between rounded-md bg-secondary/20 p-3 text-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+                          <Fingerprint className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Successful Scan</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">{log.status} • Device {log.device_id || 'UNK'}</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">{formatDateTime(log.marked_at)}</div>
+                    </div>
+                  ))
+                )}
               </div>
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <div>
-                  <div className="text-slate-200">Sewankambo Erma</div>
-                  <div className="text-xs">CS-302 (ESP32-Lab-1)</div>
-                </div>
-                <div className="text-xs text-sky-300">14 mins ago</div>
-              </div>
-              <div className="flex justify-between items-center border-b border-border/40 pb-2">
-                <div>
-                  <div className="text-slate-200">James Cole</div>
-                  <div className="text-xs">Admin Login (Web)</div>
-                </div>
-                <div className="text-xs text-sky-300">1 hour ago</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Realtime signal</CardTitle>
-            <CardDescription>
-              Live activity feed from connected biometric units.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            <p>Waiting for incoming session data...</p>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Recently Seen Devices</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {logs.devices.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No devices detected yet.</p>
+              ) : (
+                logs.devices.map((d: any) => (
+                  <div key={d.id} className="flex items-center justify-between border-b border-border/40 pb-2 last:border-0 last:pb-0">
+                    <div>
+                      <div className="text-xs font-medium text-sky-200">{d.name || d.id}</div>
+                      <div className="text-[9px] text-muted-foreground">ID: {d.id}</div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <Badge variant="success" className="h-3 text-[8px] px-1 capitalize">Online</Badge>
+                      <div className="mt-1 text-[9px] text-muted-foreground">{formatDateTime(d.last_seen)}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <Button variant="ghost" size="sm" className="w-full mt-2 text-[10px] text-sky-400" onClick={() => navigate("/devices")}>
+                View all devices
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 }
-

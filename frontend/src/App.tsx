@@ -8,6 +8,7 @@ import { DashboardPage } from "@/pages/dashboard";
 import { CoursesPage } from "@/pages/courses";
 import { DevicesPage } from "@/pages/devices";
 import { SettingsPage } from "@/pages/settings";
+import { StudentsPage } from "@/pages/students";
 import { cn } from "@/lib/utils";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -55,6 +56,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="courses" element={<CoursesPage />} />
           <Route path="devices" element={<DevicesPage />} />
+          <Route path="students" element={<StudentsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
 

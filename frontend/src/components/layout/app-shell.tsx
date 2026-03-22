@@ -18,6 +18,7 @@ import {
 const navItems = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true, roles: ["admin", "lecturer"] },
   { to: "/courses", label: "Courses", icon: GraduationCap, roles: ["admin", "lecturer"] },
+  { to: "/students", label: "Students", icon: Users, roles: ["admin", "lecturer"] },
   { to: "/devices", label: "Devices", icon: Cpu, roles: ["admin", "lecturer"] },
   { to: "/settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ] as const;
