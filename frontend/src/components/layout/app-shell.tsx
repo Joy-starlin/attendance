@@ -51,11 +51,11 @@ export function AppShell() {
             >
               {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white p-1 shadow-sm ring-1 ring-border">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1 shadow-sm ring-1 ring-border">
               <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
             </div>
-            <div className="hidden xs:block">
-              <div className="text-xs font-semibold tracking-tight">
+            <div className="flex items-center">
+              <div className="text-sm font-bold tracking-tight text-foreground whitespace-nowrap">
                 Bugema University
               </div>
             </div>
