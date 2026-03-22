@@ -116,10 +116,10 @@ export function DashboardPage() {
               Start attendance session
             </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/courses")}>
-              View courses
+              Manage Courses
             </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/students")}>
-              View students
+            <Button variant="outline" size="sm" onClick={() => navigate("/devices")}>
+              Device Status
             </Button>
           </CardContent>
         </Card>

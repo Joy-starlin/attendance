@@ -34,7 +34,10 @@ function AppTopBar() {
           </div>
           <div>
             <div className="text-md font-semibold tracking-tight">
-              Bugema Attendance
+              Faculty Portal
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">
+              Bugema University
             </div>
           </div>
         </div>

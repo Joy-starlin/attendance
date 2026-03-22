@@ -47,10 +47,10 @@ export function RegisterPage() {
             <Fingerprint className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-50">
-            Create operator account
+            Faculty Registration
           </h1>
           <p className="mt-1 text-sm text-slate-300">
-            Provision a staff account. Students are added via Courses → Import CSV.
+            Create a lecturer or admin account. Students are managed by faculty via Courses.
           </p>
         </div>
         <Card className="gradient-border-card">

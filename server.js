@@ -26,7 +26,9 @@ const deviceCommands = new Map(); // id -> { command: string, student_id: string
 // Frontend serving
 const FRONTEND_DIST = path.join(__dirname, 'frontend', 'dist');
 app.use(express.static(FRONTEND_DIST));
-app.use(express.static(__dirname));
+
+// Only serve specific public files if needed, instead of the whole root
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // DATABASE SELECTION
 const isPostgres = process.env.DB_TYPE === 'postgres' || (process.env.DATABASE_URL && (process.env.DATABASE_URL.startsWith('postgres') || process.env.DATABASE_URL.startsWith('postgresql')));
@@ -233,6 +235,7 @@ app.post('/api/auth/login', async (req, res) => {
     const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) return res.status(401).json({ error: 'User not found' });
     const user = users[0];
+    if (user.role === 'student') return res.status(403).json({ error: 'Students do not have web access. Use the biometric terminal for attendance.' });
     if (!bcrypt.compareSync(password, user.password_hash)) return res.status(401).json({ error: 'Wrong password' });
     res.json({ token: signToken({ id: user.id, name: user.name, role: user.role }), user: { id: user.id, name: user.name, role: user.role } });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -532,9 +535,7 @@ wss.on('connection', (ws) => console.log('WS connected'));
 // SPA Fallback
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/v1')) return;
-  res.sendFile(path.join(FRONTEND_DIST, 'index.html'), (err) => {
-    if (err) res.sendFile(path.join(__dirname, 'BugemaUniversity-AttendanceSystem.html'));
-  });
+  res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
 });
 
 async function start() {

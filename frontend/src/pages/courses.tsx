@@ -274,8 +274,12 @@ export function CoursesPage() {
         </Card>
       )}
       {enrollTarget && (
-        <div className="rounded-md border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-sm text-sky-200">
-          📡 Enrollment command sent to device for <strong>{enrollTarget.studentName}</strong>. Have them place their finger on the scanner within 30 seconds.
+        <div className="flex items-center gap-3 rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-sm text-sky-200 animate-pulse">
+          <RefreshCw className="h-4 w-4 animate-spin text-sky-400" />
+          <span>
+            📡 <strong>Terminal Enrollment</strong>: Scan initiated for <strong>{enrollTarget.studentName}</strong>. 
+            Have the student place their finger on the sensor now.
+          </span>
         </div>
       )}
 

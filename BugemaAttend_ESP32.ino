@@ -62,23 +62,23 @@
 
 // WiFiManager Configuration
 const char* AP_SSID = "AttendanceSystem";
-const char* AP_PASSWORD = "attend123"; // Set to null for open AP
+const char* AP_PASSWORD = ""; // Set to null for open AP
 const int AP_CHANNEL = 1;
 const bool AP_HIDDEN = false;
 const int AP_MAX_CONNECTIONS = 4;
 
-const char* DEFAULT_WIFI_SSID     = "BU-Campus-WiFi";
-const char* DEFAULT_WIFI_PASSWORD = "yourpassword";
+const char* DEFAULT_WIFI_SSID     = "Bugema--University";
+const char* DEFAULT_WIFI_PASSWORD = "        ";
 
 // Backend API (your Node.js server URL)
-const char* API_BASE_URL          = "https://attendance.onrender.com/v1"; // Change this to your Render URL after hosting
+const char* API_BASE_URL          = "https://attendance-e8s6.onrender.com/v1"; // Change this to your Render URL after hosting
 const char* API_ATTENDANCE_ENDPOINT = "/attendance";
 const char* API_FP_REGISTER_ENDPOINT = "/fingerprint/register";
 const char* API_DEVICE_HEARTBEAT  = "/device/heartbeat";
 
 // This device's unique ID — change per device
 const char* DEVICE_ID             = "ESP32-LAB-A";
-const char* DEVICE_TOKEN          = "tok_esp32_your_secret_token_here";
+const char* DEVICE_TOKEN          = "my_secret_key_123";
 
 // NTP Time server for timestamps
 const char* NTP_SERVER            = "pool.ntp.org";
