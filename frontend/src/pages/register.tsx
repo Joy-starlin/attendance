@@ -43,8 +43,8 @@ export function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center p-4 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,rgba(129,140,248,0.22),transparent_55%)]">
       <div className="w-full max-w-[400px]">
         <div className="mb-8 text-center px-2">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
-            <Fingerprint className="h-6 w-6" />
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2 shadow-sm ring-1 ring-border">
+            <img src="/logo.png" alt="Bugema Logo" className="h-full w-full object-contain" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Bugema University

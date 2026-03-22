@@ -51,8 +51,8 @@ export function AppShell() {
             >
               {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/25">
-              <Fingerprint className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white p-1 shadow-sm ring-1 ring-border">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
             </div>
             <div className="hidden xs:block">
               <div className="text-xs font-semibold tracking-tight">
