@@ -26,16 +26,35 @@ async function fetchSemesterReport() {
 
 function generateSemesterPDF(data: any[]) {
   const win = window.open("", "_blank")!;
-  const rows = data.map((r, i) => `
+  const rows = data.map((r) => `
     <tr>
-      <td style="padding:8px;border-bottom:1px solid #eee">${r.name}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee">${r.reg_no}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee">${r.course}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${r.attended} / ${r.total}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${Math.round((r.attended/r.total)*100 || 0)}%</td>
+      <td>${r.name}</td>
+      <td style="font-family:monospace">${r.reg_no}</td>
+      <td>${r.course}</td>
+      <td style="text-align:center">${r.attended} / ${r.total}</td>
+      <td style="text-align:right;font-weight:bold">${Math.round((r.attended/r.total)*100 || 0)}%</td>
     </tr>
   `).join("");
-  win.document.write(`<html><head><title>Semester Report</title></head><body><h1>Semester Attendance Summary</h1><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f1f5f9"><th>Name</th><th>Reg No</th><th>Course</th><th>Sessions</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<html><head><title>Semester Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 16px; margin: 0; color: #0f172a; }
+    h1 { font-size: 1.25rem; margin-bottom: 16px; color: #0033a0; }
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: #f8fafc; padding: 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
+    td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+    tr:nth-child(even) { background: #f8fafc; }
+  </style>
+  </head><body>
+  <h1>Bugema University — Semester Summary</h1>
+  <div class="table-responsive">
+    <table>
+      <thead><tr><th>Name</th><th>Reg No</th><th>Course</th><th style="text-align:center">Sessions</th><th style="text-align:right">%</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  </body></html>`);
   win.document.close();
 }
 

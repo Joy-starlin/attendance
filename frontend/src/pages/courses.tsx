@@ -41,19 +41,40 @@ function parseCSV(text: string): { name: string; student_id: string }[] {
 
 function generatePDF(course: Course, students: Student[]) {
   const win = window.open("", "_blank")!;
-  const rows = students.map((s, i) => {
+  const rows = students.map((s) => {
     const pct = s.total_sessions > 0 ? Math.round((s.classes_attended / s.total_sessions) * 100) : 0;
     const passed = pct >= (course.pass_criteria ?? 75);
-    return `<tr style="background:${i % 2 ? '#f9fafb' : '#fff'}">
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb">${i + 1}</td>
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb">${s.name}</td>
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb">${s.student_id || "—"}</td>
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:center">${s.classes_attended}/${s.total_sessions}</td>
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:center">${pct}%</td>
-      <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:center;color:${passed ? '#16a34a' : '#dc2626'};font-weight:600">${passed ? "PASS" : "FAIL"}</td>
+    const color = passed ? '#16a34a' : '#e11d48';
+    return `<tr>
+      <td>${s.name}</td>
+      <td style="font-family:monospace">${s.student_id || "—"}</td>
+      <td style="text-align:center">${s.classes_attended}/${s.total_sessions}</td>
+      <td style="text-align:center">${pct}%</td>
+      <td style="text-align:center;color:${color};font-weight:700">${passed ? "PASS" : "FAIL"}</td>
     </tr>`;
   }).join("");
-  win.document.write(`<html><head><title>Report — ${course.name}</title></head><body><h1>Bugema Attendance Report</h1><p>Course: ${course.code} - ${course.name}</p><table><thead><tr><th>#</th><th>Name</th><th>Reg No.</th><th>Attended</th><th>%</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<html><head><title>Report — ${course.code}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 16px; margin: 0; color: #0f172a; }
+    h1 { font-size: 1.25rem; margin-bottom: 4px; color: #0033a0; }
+    p { font-size: 0.875rem; color: #475569; margin-bottom: 20px; }
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 450px; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: #f8fafc; padding: 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
+    td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+    tr:nth-child(even) { background: #f8fafc; }
+  </style>
+  </head><body>
+  <h1>Bugema University — Attendance Report</h1>
+  <p>Course: <strong>${course.code}</strong> - ${course.name}</p>
+  <div class="table-responsive">
+    <table>
+      <thead><tr><th>Name</th><th>Reg No.</th><th style="text-align:center">Attended</th><th style="text-align:center">%</th><th style="text-align:center">Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  </body></html>`);
   win.document.close();
 }
 
@@ -165,6 +186,11 @@ export function CoursesPage() {
     await apiRequest(`/api/devices/${deviceId}/enroll`, { method: "POST", body: JSON.stringify({ student_id: studentId }) });
     setEnrollTarget({ courseId, studentId, studentName });
     setTimeout(() => setEnrollTarget(null), 8000);
+  }
+
+  function downloadReport(course: Course) {
+    const courseStudents = students[course.id] || [];
+    generatePDF(course, courseStudents);
   }
 
   return (

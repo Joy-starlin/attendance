@@ -29,15 +29,33 @@ function parseCSV(text: string): { name: string; student_id: string }[] {
 
 function generateStudentsPDF(students: any[]) {
   const win = window.open("", "_blank")!;
-  const rows = students.map((s, i) => `
-    <tr style="background:${i % 2 ? '#f9fafb' : '#fff'}">
-      <td style="padding:8px;border-bottom:1px solid #eee">${i + 1}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee">${s.name}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:12px">${s.student_id}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${s.has_fingerprint ? 'YES' : 'NO'}</td>
+  const rows = students.map((s) => `
+    <tr>
+      <td>${s.name}</td>
+      <td style="font-family:monospace">${s.student_id}</td>
+      <td style="text-align:center;font-weight:600;color:${s.has_fingerprint ? '#16a34a' : '#e11d48'}">${s.has_fingerprint ? 'YES' : 'NO'}</td>
     </tr>
   `).join("");
-  win.document.write(`<html><head><title>Student Directory</title></head><body><h1>Bugema Attendance — Student Directory</h1><table style="width:100%;border-collapse:collapse"><thead><tr><th>#</th><th>Name</th><th>Reg No.</th><th>Enrolled</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<html><head><title>Student Directory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 16px; margin: 0; color: #0f172a; }
+    h1 { font-size: 1.25rem; margin-bottom: 16px; color: #0033a0; }
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 400px; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: #f8fafc; padding: 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
+    td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+    tr:nth-child(even) { background: #f8fafc; }
+  </style>
+  </head><body>
+  <h1>Bugema University — Student Directory</h1>
+  <div class="table-responsive">
+    <table>
+      <thead><tr><th>Name</th><th>Reg No.</th><th style="text-align:center">Enrolled</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  </body></html>`);
   win.document.close();
 }
 
