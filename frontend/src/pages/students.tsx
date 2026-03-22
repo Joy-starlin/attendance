@@ -37,17 +37,26 @@ function generateStudentsPDF(students: any[]) {
     </tr>
   `).join("");
   win.document.write(`<html><head><title>Student Directory</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; padding: 16px; margin: 0; color: #0f172a; }
-    h1 { font-size: 1.25rem; margin-bottom: 16px; color: #0033a0; }
-    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 16px; margin: 0; color: #0f172a; background: #fff; }
+    h1 { font-size: 1.25rem; margin-top: 0; margin-bottom: 16px; color: #0033a0; }
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
     table { width: 100%; min-width: 400px; border-collapse: collapse; font-size: 0.875rem; }
-    th { background: #f8fafc; padding: 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
-    td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+    th { background: #f8fafc; padding: 12px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #475569; }
+    td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; }
     tr:nth-child(even) { background: #f8fafc; }
+    .actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    button { padding: 10px 16px; font-size: 0.875rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 600; color: white; flex: 1; min-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .btn-print { background: #0033a0; }
+    .btn-close { background: #e11d48; }
+    @media print { .no-print { display: none !important; } body { padding: 0 !important; } .table-responsive { overflow-x: visible !important; } }
   </style>
   </head><body>
+  <div class="actions no-print">
+    <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    <button class="btn-close" onclick="window.close()">Close Report</button>
+  </div>
   <h1>Bugema University — Student Directory</h1>
   <div class="table-responsive">
     <table>
