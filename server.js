@@ -365,7 +365,7 @@ app.post('/api/courses/:id/students/bulk', authMiddleware, async (req, res) => {
   for (const s of students) {
     try {
       const id = uuidv4();
-      const email = s.email || `${s.student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug`;
+      const email = s.email || `${id}@student.local`;
       const hash = bcrypt.hashSync(s.student_id || 'changeme123', 10);
       
       if (isPostgres) {
@@ -412,7 +412,7 @@ app.post('/api/courses/:id/students', authMiddleware, async (req, res) => {
   const course_id = req.params.id;
   try {
     const id = uuidv4();
-    const email = `${student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug`;
+    const email = `${id}@student.local`;
     const hash = bcrypt.hashSync(student_id || 'changeme123', 10);
     
     if (isPostgres) {

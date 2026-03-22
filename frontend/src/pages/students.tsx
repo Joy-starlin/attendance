@@ -19,11 +19,11 @@ async function apiRequest(path: string, init?: RequestInit) {
   return res.json();
 }
 
-function parseCSV(text: string): { name: string; student_id: string; email?: string }[] {
+function parseCSV(text: string): { name: string; student_id: string }[] {
   const lines = text.trim().split(/\r?\n/);
   return lines.slice(1).map(l => {
-    const [name, student_id, email] = l.split(",").map(s => s.trim());
-    return { name, student_id, email: email || `${student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug` };
+    const [name, student_id] = l.split(",").map(s => s.trim());
+    return { name, student_id };
   }).filter(r => r.name && r.student_id);
 }
 
@@ -34,11 +34,10 @@ function generateStudentsPDF(students: any[]) {
       <td style="padding:8px;border-bottom:1px solid #eee">${i + 1}</td>
       <td style="padding:8px;border-bottom:1px solid #eee">${s.name}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:12px">${s.student_id}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:12px">${s.email || '-'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${s.has_fingerprint ? 'YES' : 'NO'}</td>
     </tr>
   `).join("");
-  win.document.write(`<html><head><title>Student Directory</title></head><body><h1>Bugema Attendance — Student Directory</h1><table style="width:100%;border-collapse:collapse"><thead><tr><th>#</th><th>Name</th><th>Reg No.</th><th>Email</th><th>Enrolled</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<html><head><title>Student Directory</title></head><body><h1>Bugema Attendance — Student Directory</h1><table style="width:100%;border-collapse:collapse"><thead><tr><th>#</th><th>Name</th><th>Reg No.</th><th>Enrolled</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
   win.document.close();
 }
 
@@ -50,7 +49,7 @@ export function StudentsPage() {
   const [showRegisterModal, setShowRegisterModal] = React.useState(false);
   const [editingStudent, setEditingStudent] = React.useState<Student | null>(null);
   const [registering, setRegistering] = React.useState(false);
-  const [formData, setFormData] = React.useState({ name: "", email: "", student_id: "", year_of_study: 1 });
+  const [formData, setFormData] = React.useState({ name: "", student_id: "", year_of_study: 1 });
   const [csvStatus, setCsvStatus] = React.useState("");
   const [enrollTarget, setEnrollTarget] = React.useState<{ id: string; name: string } | null>(null);
   const [devices, setDevices] = React.useState<any[]>([]);
@@ -164,7 +163,6 @@ export function StudentsPage() {
                      <td className="px-3 py-3 text-xs font-mono text-sky-400">{s.student_id ? s.student_id.slice(-8) : "-"}</td>
                      <td className="px-3 py-3">
                        <div className="font-medium text-slate-200 text-xs sm:text-sm">{s.name}</div>
-                       <div className="text-[9px] text-slate-500 hidden xs:block">{s.email}</div>
                      </td>
                      <td className="px-3 py-3 text-xs hidden sm:table-cell">Yr {s.year_of_study || 1}</td>
                      <td className="px-3 py-3">
@@ -193,9 +191,9 @@ export function StudentsPage() {
             <form onSubmit={async (e) => {
               e.preventDefault(); setRegistering(true);
               try {
-                const finalEmail = formData.email?.trim() || `${formData.student_id.replace(/\//g, '').toLowerCase()}@bugema.ac.ug`;
+                const finalEmail = `${Math.random().toString(36).slice(2)}@student.local`;
                 await api.register({ ...formData, email: finalEmail, role: "student", password: formData.student_id });
-                setShowRegisterModal(false); load(); setFormData({ name: "", email: "", student_id: "", year_of_study: 1 });
+                setShowRegisterModal(false); load(); setFormData({ name: "", student_id: "", year_of_study: 1 });
                 showToast("Student registered successfully", "success");
               } catch (err: any) { showToast(err.message, "error"); } finally { setRegistering(false); }
             }}>
@@ -223,7 +221,7 @@ export function StudentsPage() {
             <form onSubmit={async (e) => {
               e.preventDefault();
               try {
-                const finalEditEmail = editingStudent.email?.trim() || `${(editingStudent.student_id || '').replace(/\//g, "").toLowerCase()}@bugema.ac.ug`;
+                const finalEditEmail = editingStudent.email || `${Math.random().toString(36).slice(2)}@student.local`;
                 await apiRequest(`/api/students/${editingStudent.id}`, { method: "PUT", body: JSON.stringify({...editingStudent, email: finalEditEmail}) });
                 setEditingStudent(null); load();
                 showToast("Student profile updated successfully", "success");
@@ -235,7 +233,6 @@ export function StudentsPage() {
                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Reg No.</Label><Input value={editingStudent.student_id || ""} onChange={e => setEditingStudent({...editingStudent, student_id: e.target.value})} className="h-9 font-mono" /></div>
                   <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Year</Label><Input type="number" value={editingStudent.year_of_study || 1} onChange={e => setEditingStudent({...editingStudent, year_of_study: parseInt(e.target.value)})} className="h-9" /></div>
                 </div>
-                <div className="space-y-1"><Label className="text-xs text-slate-400 uppercase">Email Address</Label><Input type="email" value={editingStudent.email || ""} onChange={e => setEditingStudent({...editingStudent, email: e.target.value})} className="h-9" /></div>
               </CardContent>
               <div className="flex items-center justify-end gap-2 p-4 border-t border-slate-800 bg-slate-950/20">
                 <Button variant="ghost" size="sm" onClick={() => setEditingStudent(null)}>Cancel</Button>
