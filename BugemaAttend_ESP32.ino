@@ -57,6 +57,47 @@
 #include <WiFiManager.h>
 
 // ============================================================
+//  PROTOTYPES (to avoid scope errors)
+// ============================================================
+void oledMsg(String line1, String line2, String line3);
+void showSplash();
+void showIdleScreen();
+void displayAttendanceIdle();
+void setupWiFiManager();
+bool connectWithWiFiManager();
+void startAPMode();
+void handleBluetoothConfig();
+void setupWebServer();
+void configModeCallback(WiFiManager *myWiFiManager);
+void saveConfigCallback();
+void handleWebServer();
+String getConfigPageHTML();
+String scanWiFiNetworks();
+void handleWiFiConnect();
+void handleDeviceConfig();
+String getDeviceStatus();
+void handleAPModeButtons();
+void connectWiFi(const char* ssid, const char* pass);
+String getTimestamp();
+int getNextFreeSlot();
+void startBluetoothSession(String sessionId);
+void stopBluetoothSession();
+void markBluetoothAttendance(String fpId);
+void enrollBluetoothFingerprint(String studentId);
+void deleteBluetoothFingerprint(String fpId);
+void syncBluetoothQueue();
+void showBluetoothQueue();
+void clearBluetoothQueue();
+void syncOfflineQueue();
+bool sendAttendanceRaw(struct AttendRecord rec);
+void startSession();
+void stopSession();
+void attendanceLoop();
+void enrollLoop();
+void deleteLoop();
+bool enrollFingerprintStep(int fingerId);
+
+// ============================================================
 //  CONFIGURATION — CHANGE THESE
 // ============================================================
 
@@ -91,12 +132,6 @@ const int   SESSION_LOCK_MINUTES  = 5;
 // ============================================================
 //  PIN DEFINITIONS
 // ============================================================
-#define BTN_ENROLL    13
-#define BTN_ATTEND    12
-#define BTN_DELETE    14
-#define BTN_WIFI      27
-#define LED_GREEN     2
-#define LED_RED       4
 #define FP_RX         16
 #define FP_TX         17
 
@@ -139,10 +174,6 @@ const int OFFLINE_QUEUE_SIZE = 200;
 AttendRecord offlineQueue[OFFLINE_QUEUE_SIZE];
 int offlineCount = 0;
 
-// Debounce
-unsigned long lastBtnPress[4] = {0,0,0,0};
-const int DEBOUNCE_MS = 300;
-
 // Heartbeat timer
 unsigned long lastHeartbeat = 0;
 
@@ -152,15 +183,6 @@ unsigned long lastHeartbeat = 0;
 void setup() {
   Serial.begin(115200);
   Serial.println("🎓 Bugema University Attendance System v2.0 - WiFiManager");
-
-  // Pins
-  pinMode(BTN_ENROLL, INPUT_PULLUP);
-  pinMode(BTN_ATTEND, INPUT_PULLUP);
-  pinMode(BTN_DELETE, INPUT_PULLUP);
-  pinMode(BTN_WIFI,   INPUT_PULLUP);
-  pinMode(LED_GREEN,  OUTPUT);
-  pinMode(LED_RED,    OUTPUT);
-  ledOff();
 
   // OLED
   Wire.begin(21, 22);
@@ -177,7 +199,6 @@ void setup() {
     oledMsg("FP Sensor OK", "Ready");
   } else {
     oledMsg("FP Sensor FAIL", "Check wiring");
-    flashRed(5);
   }
 
   // Initialize WiFiManager
@@ -205,7 +226,6 @@ void setup() {
 //  MAIN LOOP - ENHANCED WITH BLUETOOTH FALLBACK
 // ============================================================
 void loop() {
-  checkButtons();
   handleBluetoothConfig();
 
   // Check WiFi connection and auto-fallback to Bluetooth
@@ -306,97 +326,36 @@ void bluetoothAttendanceLoop() {
         // Mark attendance via Bluetooth
         markBluetoothAttendance(fpId);
         
-        // Visual feedback
-        flashGreen(1);
-        
         // Send immediate notification via Bluetooth
         SerialBT.println("SCAN_SUCCESS:" + fpId + ",timestamp:" + getTimestamp());
         
       } else if (p == FINGERPRINT_NOTFOUND) {
         // Fingerprint not found
         oledMsg("❌ NOT FOUND", "Register first", "Try again");
-        flashRed(1);
         
         SerialBT.println("SCAN_FAILED:Fingerprint not found in database");
         
       } else {
         // Other error
         oledMsg("❌ SCAN ERROR", "Try again", "Check finger");
-        flashRed(2);
         
         SerialBT.println("SCAN_FAILED:Scan error, code " + String(p));
       }
     } else {
       // Image conversion failed
       oledMsg("❌ IMAGE ERROR", "Try again", "Clean sensor");
-      flashRed(1);
       
       SerialBT.println("SCAN_FAILED:Image conversion failed");
     }
   } else if (p != FINGERPRINT_NOFINGER) {
     // Other error (not "no finger")
     oledMsg("❌ SENSOR ERROR", "Check wiring", "Reset device");
-    flashRed(3);
     
     SerialBT.println("SCAN_FAILED:Sensor error, code " + String(p));
   }
   
   // Small delay to prevent overwhelming
   delay(100);
-}
-
-// ============================================================
-//  BUTTON HANDLING
-// ============================================================
-void checkButtons() {
-  unsigned long now = millis();
-
-  // BTN_ENROLL — toggle enroll mode
-  if (digitalRead(BTN_ENROLL) == LOW && now - lastBtnPress[0] > DEBOUNCE_MS) {
-    lastBtnPress[0] = now;
-    if (currentMode != MODE_ENROLL) {
-      currentMode = MODE_ENROLL;
-      oledMsg("ENROLL MODE", "Waiting...");
-    } else {
-      currentMode = MODE_IDLE;
-      showIdleScreen();
-    }
-  }
-
-  // BTN_ATTEND — start/stop session
-  if (digitalRead(BTN_ATTEND) == LOW && now - lastBtnPress[1] > DEBOUNCE_MS) {
-    lastBtnPress[1] = now;
-    if (!sessionActive) {
-      startSession();
-    } else {
-      stopSession();
-    }
-  }
-
-  // BTN_DELETE — delete mode
-  if (digitalRead(BTN_DELETE) == LOW && now - lastBtnPress[2] > DEBOUNCE_MS) {
-    lastBtnPress[2] = now;
-    if (currentMode != MODE_DELETE) {
-      currentMode = MODE_DELETE;
-      oledMsg("DELETE MODE", "Scan to delete");
-    } else {
-      currentMode = MODE_IDLE;
-      showIdleScreen();
-    }
-  }
-
-  // BTN_WIFI — toggle Bluetooth config mode
-  if (digitalRead(BTN_WIFI) == LOW && now - lastBtnPress[3] > DEBOUNCE_MS) {
-    lastBtnPress[3] = now;
-    bluetoothMode = !bluetoothMode;
-    if (bluetoothMode) {
-      currentMode = MODE_BT;
-      oledMsg("BLUETOOTH MODE", "Connect app", "BU-Attend-" + String(DEVICE_ID));
-    } else {
-      currentMode = MODE_IDLE;
-      showIdleScreen();
-    }
-  }
 }
 
 // ============================================================
@@ -410,7 +369,6 @@ void startSession() {
     sessionActive    = true;
     currentMode      = MODE_ATTEND;
     oledMsg("SESSION STARTED", "Offline Mode", "Scan fingers");
-    flashGreen(2);
     return;
   }
 
@@ -430,13 +388,10 @@ void startSession() {
     sessionActive    = true;
     currentMode      = MODE_ATTEND;
     oledMsg("SESSION ACTIVE", courseName.substring(0,16), "Scan fingers now");
-    flashGreen(2);
   } else if (code == 404) {
     oledMsg("NO ACTIVE SESSION", "Start one from", "the web app");
-    flashRed(3);
   } else {
     oledMsg("API ERROR", "Code: " + String(code), "Check server");
-    flashRed(2);
   }
   http.end();
 }
@@ -458,7 +413,6 @@ void stopSession() {
   currentSessionId = "";
   currentCourseId  = "";
   oledMsg("SESSION ENDED", "Report saved", "on server");
-  flashGreen(1);
   delay(2000);
   showIdleScreen();
 }
@@ -479,7 +433,6 @@ void attendanceLoop() {
     String ts = getTimestamp();
 
     oledMsg("FOUND!", "ID #" + String(fpId), "Conf: " + String(confidence) + "%");
-    flashGreen(1);
 
     // Send to API
     bool sent = sendAttendance(fpId, ts, "present");
@@ -531,7 +484,6 @@ void enrollLoop() {
   if (id < 0) {
     oledMsg("MEMORY FULL", "Delete old FPs", "first");
     sendLog("ERROR", "Sensor memory full");
-    flashRed(3);
     currentMode = MODE_IDLE;
     return;
   }
@@ -543,11 +495,6 @@ void enrollLoop() {
   // First scan
   while (finger.getImage() != FINGERPRINT_OK) {
     delay(200);
-    if (digitalRead(BTN_ENROLL) == LOW) { 
-      sendLog("CANCELLED", "Enrollment cancelled by button");
-      currentMode = MODE_IDLE; 
-      return; 
-    }
   }
   finger.image2Tz(1);
   oledMsg("SCAN 1/2 OK", "Lift finger", "");
@@ -561,11 +508,6 @@ void enrollLoop() {
   sendLog("WAITING_FOR_SCAN_2", "Please place the same finger again.");
   while (finger.getImage() != FINGERPRINT_OK) {
     delay(200);
-    if (digitalRead(BTN_ENROLL) == LOW) { 
-      sendLog("CANCELLED", "Enrollment cancelled by button");
-      currentMode = MODE_IDLE; 
-      return; 
-    }
   }
   finger.image2Tz(2);
 
@@ -573,7 +515,6 @@ void enrollLoop() {
   if (p != FINGERPRINT_OK) {
     oledMsg("ENROLL FAILED", "Scans didn't match", "Try again");
     sendLog("ERROR_MATCH", "Fingerprint scans did not match. Try again.");
-    flashRed(3);
     currentMode = MODE_IDLE;
     return;
   }
@@ -582,7 +523,6 @@ void enrollLoop() {
   if (p == FINGERPRINT_OK) {
     oledMsg("ENROLLED!", "FP ID: #" + String(id), "Saved to sensor");
     sendLog("SUCCESS", "Fingerprint #" + String(id) + " enrolled successfully!");
-    flashGreen(3);
 
     // Notify backend specifically for the link
     if (wifiConnected) {
@@ -605,7 +545,6 @@ void enrollLoop() {
   } else {
     oledMsg("STORE FAILED", "Error: " + String(p), "");
     sendLog("ERROR_STORE", "Failed to store model. Error code: " + String(p));
-    flashRed(2);
   }
 
   delay(2000);
@@ -622,7 +561,6 @@ void deleteLoop() {
 
   unsigned long start = millis();
   while (millis() - start < 10000) {
-    if (digitalRead(BTN_DELETE) == LOW) { currentMode = MODE_IDLE; showIdleScreen(); return; }
     uint8_t p = finger.getImage();
     if (p != FINGERPRINT_OK) { delay(200); continue; }
     finger.image2Tz();
@@ -630,7 +568,6 @@ void deleteLoop() {
       uint8_t id = finger.fingerID;
       finger.deleteModel(id);
       oledMsg("DELETED", "FP ID: #" + String(id), "Removed");
-      flashRed(2);
       delay(2000);
       currentMode = MODE_IDLE;
       showIdleScreen();
@@ -764,6 +701,10 @@ bool sendAttendanceRaw(AttendRecord rec) {
   body += "\"offline\":true}";
 
   int code = http.POST(body);
+  http.end();
+  return (code == 201 || code == 200);
+}
+
 // ============================================================
 /**
  * Connect to the ESP32 via Bluetooth Serial from any phone
@@ -1028,7 +969,7 @@ void syncBluetoothQueue() {
   for (int i = 0; i < offlineCount; i++) {
     AttendRecord rec = offlineQueue[i];
     if (!rec.synced) {
-      if (syncSingleRecord(rec)) {
+      if (sendAttendanceRaw(rec)) {
         rec.synced = true;
         offlineQueue[i] = rec;
         synced++;
@@ -1240,16 +1181,9 @@ void startAPMode() {
   // Show AP mode on OLED
   oledMsg("CONFIG MODE", "IP: " + apIP.toString(), "Connect phone/laptop");
   
-  // Blink LED to indicate AP mode
   while (apMode) {
     handleWebServer();
-    handleAPModeButtons();
-    
-    // Blink LED
-    digitalWrite(LED_GREEN, HIGH);
-    delay(500);
-    digitalWrite(LED_GREEN, LOW);
-    delay(500);
+    delay(10);
   }
 }
 
@@ -1314,7 +1248,7 @@ void handleWebServer() {
 }
 
 String getConfigPageHTML() {
-  String html = R"(
+  String html = R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
@@ -1436,7 +1370,7 @@ String getConfigPageHTML() {
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status-message');
             statusDiv.innerHTML = '<div class="status ' + type + '">' + message + '</div>';
-            setTimeout(() => statusDiv.innerHTML = '', 5000);
+            setTimeout(() => statusDiv.innerHTML = "", 5000);
         }
         
         function scanNetworks() {
@@ -1444,7 +1378,7 @@ String getConfigPageHTML() {
                 .then(response => response.json())
                 .then(data => {
                     const listDiv = document.getElementById('network-list');
-                    listDiv.innerHTML = '';
+                    listDiv.innerHTML = "";
                     
                     if (data.networks && data.networks.length > 0) {
                         data.networks.forEach(network => {
@@ -1564,7 +1498,7 @@ String getConfigPageHTML() {
     </script>
 </body>
 </html>
-  )";
+)rawliteral";
   
   return html;
 }
@@ -1624,13 +1558,13 @@ void handleDeviceConfig() {
   // Save device configuration
   prefs.begin("bugema-iot", false);
   if (doc.containsKey("device_id")) {
-    prefs.putString("device_id", doc["device_id"]);
+    prefs.putString("device_id", doc["device_id"].as<String>());
   }
   if (doc.containsKey("api_url")) {
-    prefs.putString("api_url", doc["api_url"]);
+    prefs.putString("api_url", doc["api_url"].as<String>());
   }
   if (doc.containsKey("device_token")) {
-    prefs.putString("device_token", doc["device_token"]);
+    prefs.putString("device_token", doc["device_token"].as<String>());
   }
   prefs.end();
   
@@ -1650,42 +1584,6 @@ String getDeviceStatus() {
   
   return json;
 }
-
-void handleAPModeButtons() {
-  unsigned long now = millis();
-  
-  // Check for WiFi button press to exit AP mode
-  if (digitalRead(BTN_WIFI) == LOW && now - lastBtnPress[3] > DEBOUNCE_MS) {
-    lastBtnPress[3] = now;
-    
-    // Try to connect with saved credentials
-    prefs.begin("bugema-iot", false);
-    String savedSSID = prefs.getString("ssid", DEFAULT_WIFI_SSID);
-    String savedPASS = prefs.getString("pass", DEFAULT_WIFI_PASSWORD);
-    prefs.end();
-    
-    WiFi.begin(savedSSID.c_str(), savedPASS.c_str());
-    
-    int tries = 0;
-    while (WiFi.status() != WL_CONNECTED && tries < 10) {
-      delay(500);
-      tries++;
-    }
-    
-    if (WiFi.status() == WL_CONNECTED) {
-      apMode = false;
-      configMode = false;
-      wifiConnected = true;
-      
-      oledMsg("WiFi Connected", WiFi.localIP().toString(), "Exiting AP mode");
-      delay(2000);
-      
-      // Restart to normal mode
-      ESP.restart();
-    }
-  }
-}
-
 // ... (rest of the code remains the same)
 void connectWiFi(const char* ssid, const char* pass) {
   oledMsg("Connecting WiFi", ssid, "Please wait...");
@@ -1702,11 +1600,9 @@ void connectWiFi(const char* ssid, const char* pass) {
     wifiConnected = true;
     configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
     oledMsg("WiFi Connected!", WiFi.localIP().toString(), "");
-    flashGreen(2);
   } else {
     wifiConnected = false;
     oledMsg("WiFi FAILED", "Offline Mode", "Use BT to config");
-    flashRed(3);
   }
 }
 
@@ -1780,30 +1676,4 @@ void oledMsg(String line1, String line2, String line3) {
   display.setCursor(0, 22); display.println(line2);
   display.setCursor(0, 40); display.println(line3);
   display.display();
-}
-
-// ============================================================
-//  LED HELPERS
-// ============================================================
-void ledOff() {
-  digitalWrite(LED_GREEN, LOW);
-  digitalWrite(LED_RED,   LOW);
-}
-
-void flashGreen(int n) {
-  for (int i = 0; i < n; i++) {
-    digitalWrite(LED_GREEN, HIGH);
-    delay(200);
-    digitalWrite(LED_GREEN, LOW);
-    delay(150);
-  }
-}
-
-void flashRed(int n) {
-  for (int i = 0; i < n; i++) {
-    digitalWrite(LED_RED, HIGH);
-    delay(200);
-    digitalWrite(LED_RED, LOW);
-    delay(150);
-  }
 }
