@@ -305,7 +305,11 @@ app.delete('/api/courses/:id', authMiddleware, async (req, res) => {
 
 // STUDENTS
 app.get('/api/students', authMiddleware, async (req, res) => {
-  const [students] = await db.execute("SELECT id, name, email, student_id, year_of_study FROM users WHERE role = 'student'");
+  const [students] = await db.execute(
+    `SELECT u.id, u.name, u.email, u.student_id, u.year_of_study,
+      (SELECT COUNT(*) FROM fingerprints WHERE student_id = u.id) as has_fingerprint
+     FROM users u WHERE u.role = 'student'`
+  );
   res.json(students);
 });
 
@@ -477,7 +481,17 @@ app.get('/api/students/:id/fingerprints', authMiddleware, async (req, res) => {
 
 app.get('/api/devices', authMiddleware, async (req, res) => {
   const [devices] = await db.execute('SELECT * FROM devices');
-  res.json(devices);
+  // Mark devices as offline if last_seen > 2 minutes ago
+  const now = new Date();
+  const devicesWithStatus = devices.map(d => {
+    const lastSeen = d.last_seen ? new Date(d.last_seen) : null;
+    const isStale = !lastSeen || (now - lastSeen) > 2 * 60 * 1000; // 2 minutes
+    return {
+      ...d,
+      status: isStale ? 'offline' : 'online'
+    };
+  });
+  res.json(devicesWithStatus);
 });
 
 
@@ -497,6 +511,23 @@ app.post('/api/devices/:id/enroll', authMiddleware, async (req, res) => {
 });
 
 // SESSIONS
+app.get('/api/sessions/:id/attendance', authMiddleware, async (req, res) => {
+  try {
+    const [session] = await db.execute('SELECT * FROM sessions WHERE id = ?', [req.params.id]);
+    if (session.length === 0) return res.status(404).json({ error: 'Session not found' });
+    
+    const [attendees] = await db.execute(
+      `SELECT u.id, u.name, u.student_id, a.marked_at, a.status
+       FROM attendance a
+       JOIN users u ON a.student_id = u.id
+       WHERE a.session_id = ?
+       ORDER BY a.marked_at`,
+      [req.params.id]
+    );
+    res.json({ session: session[0], attendees });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/sessions', authMiddleware, async (req, res) => {
   const { course_id, device_id, duration_minutes } = req.body;
   const id = uuidv4();
@@ -505,12 +536,25 @@ app.post('/api/sessions', authMiddleware, async (req, res) => {
       'INSERT INTO sessions (id, course_id, lecturer_id, device_id, duration_minutes, status) VALUES (?,?,?,?,?,?)',
       [id, course_id, req.user.id, device_id, duration_minutes || 60, 'active']
     );
+    // Send command to device to start attendance mode
+    deviceCommands.set(device_id, { 
+      command: 'START_SESSION', 
+      session_id: id,
+      course_id: course_id
+    });
     res.status(201).json({ session_id: id });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/sessions/:id/stop', authMiddleware, async (req, res) => {
   try {
+    // Get session to find device_id
+    const [sessions] = await db.execute("SELECT device_id FROM sessions WHERE id = ?", [req.params.id]);
+    if (sessions.length > 0) {
+      const deviceId = sessions[0].device_id;
+      // Send stop command to device
+      deviceCommands.set(deviceId, { command: 'STOP_SESSION' });
+    }
     await db.execute("UPDATE sessions SET status = 'completed', ended_at = NOW() WHERE id = ?", [req.params.id]);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -566,6 +610,16 @@ app.post('/v1/attendance', async (req, res) => {
     if (fps.length === 0) return res.status(404).json({ error: 'Fingerprint not linked to a registered profile' });
     
     const student_id = fps[0].student_id;
+    
+    // Check if student is enrolled in this course
+    const [enrollment] = await db.execute(
+      'SELECT 1 FROM student_courses WHERE student_id = ? AND course_id = ?',
+      [student_id, course_id]
+    );
+    if (enrollment.length === 0) {
+      return res.status(403).json({ error: 'Student not enrolled in this course' });
+    }
+    
     const id = uuidv4();
     await db.execute(
       'INSERT INTO attendance (id, session_id, course_id, student_id, status, marked_at, fp_id, confidence) VALUES (?,?,?,?,?,?,?,?)',

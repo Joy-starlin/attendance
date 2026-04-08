@@ -32,9 +32,18 @@ async function apiRequest(path: string, init?: RequestInit) {
 }
 
 function parseCSV(text: string): { name: string; student_id: string }[] {
-  const lines = text.trim().split(/\r?\n/);
-  return lines.slice(1).map(l => {
-    const [name, student_id] = l.split(",").map(s => s.trim());
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length === 0) return [];
+  
+  // Check if first line is header (contains 'name' or 'student')
+  const firstLine = lines[0].toLowerCase();
+  const hasHeader = firstLine.includes('name') || firstLine.includes('student');
+  const dataLines = hasHeader ? lines.slice(1) : lines;
+  
+  return dataLines.map(l => {
+    // Handle quoted values and trim whitespace
+    const cols = l.split(',').map(s => s.trim().replace(/^["']|["']$/g, ''));
+    const [name, student_id] = cols;
     return { name, student_id };
   }).filter(r => r.name && r.student_id);
 }

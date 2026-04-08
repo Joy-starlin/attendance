@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, RefreshCw, Search, Upload, Fingerprint, FileDown, Plus, X, Edit3, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Users, RefreshCw, Search, Upload, Fingerprint, FileDown, Plus, X, Edit3, Trash2, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 async function apiRequest(path: string, init?: RequestInit) {
   const token = localStorage.getItem("token");
@@ -20,9 +20,18 @@ async function apiRequest(path: string, init?: RequestInit) {
 }
 
 function parseCSV(text: string): { name: string; student_id: string }[] {
-  const lines = text.trim().split(/\r?\n/);
-  return lines.slice(1).map(l => {
-    const [name, student_id] = l.split(",").map(s => s.trim());
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length === 0) return [];
+  
+  // Check if first line is header (contains 'name' or 'student')
+  const firstLine = lines[0].toLowerCase();
+  const hasHeader = firstLine.includes('name') || firstLine.includes('student');
+  const dataLines = hasHeader ? lines.slice(1) : lines;
+  
+  return dataLines.map(l => {
+    // Handle quoted values and trim whitespace
+    const cols = l.split(',').map(s => s.trim().replace(/^["']|["']$/g, ''));
+    const [name, student_id] = cols;
     return { name, student_id };
   }).filter(r => r.name && r.student_id);
 }
@@ -117,8 +126,29 @@ export function StudentsPage() {
     try {
       await apiRequest(`/api/devices/${devId}/enroll`, { method: "POST", body: JSON.stringify({ student_id: studentId }) });
       setEnrollTarget({ id: studentId, name: studentName });
-      showToast(`Enrollment started for ${studentName}`, "success");
-      setTimeout(() => setEnrollTarget(null), 15000);
+      showToast(`Enrollment started for ${studentName}. Place finger on sensor...`, "success");
+      
+      // Poll for enrollment completion (check if fingerprint appears)
+      let attempts = 0;
+      const maxAttempts = 60; // 60 seconds max
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        try {
+          const student = await api.student(studentId);
+          if (student.has_fingerprint) {
+            clearInterval(pollInterval);
+            setEnrollTarget(null);
+            showToast(`${studentName} enrolled successfully!`, "success");
+            load(); // Refresh student list
+          } else if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            setEnrollTarget(null);
+            showToast(`Enrollment timeout for ${studentName}`, "error");
+          }
+        } catch (e) {
+          // Silent fail on poll error
+        }
+      }, 1000);
     } catch (err: any) { showToast(err.message, "error"); }
   }
 
@@ -134,6 +164,17 @@ export function StudentsPage() {
           <p className="mt-1 text-sm text-muted-foreground">View and manage registered student profiles.</p>
         </div>
         <div className="flex items-center gap-2">
+           {devices.length > 0 && (
+             <select 
+               value={selectedDevice} 
+               onChange={(e) => setSelectedDevice(e.target.value)}
+               className="h-9 px-3 text-xs bg-background border border-input rounded-md focus:outline-none focus:ring-1 focus:ring-ring"
+             >
+               {devices.map(d => (
+                 <option key={d.id} value={d.id}>{d.name || d.id}</option>
+               ))}
+             </select>
+           )}
            <Button onClick={() => setShowRegisterModal(true)} className="bg-primary hover:bg-primary w-full sm:w-auto">
              <Plus className="mr-2 h-4 w-4" /> <span className="hidden xs:inline">New Student</span>
            </Button>
@@ -199,9 +240,17 @@ export function StudentsPage() {
                      </td>
                      <td className="px-3 py-3 text-right">
                        <div className="flex justify-end gap-1">
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleLiveEnroll(s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setEditingStudent(s)}><Edit3 className="h-3.5 w-3.5" /></Button>
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => handleDeleteClick(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                         {enrollTarget?.id === s.id ? (
+                           <span className="flex items-center gap-1 text-xs text-amber-500 animate-pulse">
+                             <Loader2 className="h-3.5 w-3.5 animate-spin" /> Enrolling...
+                           </span>
+                         ) : (
+                           <>
+                             <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleLiveEnroll(s.id, s.name)}><Fingerprint className="h-3.5 w-3.5" /></Button>
+                             <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setEditingStudent(s)}><Edit3 className="h-3.5 w-3.5" /></Button>
+                             <Button size="icon" variant="ghost" className="h-8 w-8 text-rose-500" onClick={() => handleDeleteClick(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                           </>
+                         )}
                        </div>
                      </td>
                    </tr>
